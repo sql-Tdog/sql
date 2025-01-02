@@ -1,5 +1,5 @@
 /***********************TRANSPARENT DATA ENCRYPTION***************************************************
-**there are 2 parts to this encryption script:
+**
 Performs real-time I/O encryption and decryption of the data and log files
 Uses a Database Encryption Key (DEK), stored in the database boot record and secured by a certificate
 stored in the master database or an assymetric key protected by an EKM module
@@ -7,23 +7,33 @@ TDE protects data at rest (data and log files), no encryption across communicati
 The certificate & private key will be needed to restore the database on a new server; 
 retain these even if TDE gets turned off, it may be needed for some operations.
 Backup files of a TDE enabled database are also encrypted using the DEK.
-
+Backups don't need to be taken WITH ENCRYPTION if TDE is on.    TDE encrypts mdf, ldf, and bak files.
+Taking backups WITH ENCRYPTION can be used to encrypt backups only.
 ***************************************************************************************/
+
 /***
-The database master key is a symmetric key that is used to protect the private keys of certificates and asymmetric keys that are present in the database. 
-It can also be used to encrypt data, but it has length limitations that make it less practical for data than using a symmetric key.
-When it is created, the master key is encrypted by using the Triple DES algorithm and a user-supplied password. To enable the automatic decryption of the master key, 
-a copy of the key is encrypted by using the service master key and stored in both the database when it is in use and in the master system database. 
-Typically, the copy stored in the master db is silently updated whenever the database master key is changed. This default can be changed by using the 
-DROP ENCRYPTION BY SERVICE MASTER KEY option of ALTER MASTER KEY. 
-A master key that is not encrypted by the service master key must be opened by using the OPEN MASTER KEY statement and a password.
+The database master key is a symmetric key that is used to protect the private keys of certificates 
+and asymmetric keys that are present in the database. It can also be used to encrypt data, but it has 
+length limitations that make it less practical for data than using a symmetric key.
+When it is created, the master key is encrypted by using the Triple DES algorithm and a user-supplied 
+password. To enable the automatic decryption of the master key, a copy of the key is encrypted by 
+using the service master key and stored in both the database when it is in use and in the master 
+system database. 
+Typically, the copy stored in the master db is silently updated whenever the database master key is 
+changed. This default can be changed by using the DROP ENCRYPTION BY SERVICE MASTER KEY option 
+of ALTER MASTER KEY. 
+A master key that is not encrypted by the service master key must be opened by using the 
+OPEN MASTER KEY statement and a password.
 
-To encrypt a database using TDE (Transparent Database Encryption, at the file level), the certificate or asymmetric key that is used to encrypt the database
-encryption key must be located in the master system database.
+To encrypt a database using TDE (Transparent Database Encryption, at the file level), 
+the certificate or asymmetric key that is used to encrypt the database encryption key must be 
+located in the master system database.
 
-Database Master Key is created in the context of the master database and is used to create certificates used for database level encryption.
+Database Master Key is created in the context of the master database and is used to create 
+certificates used for database level encryption.
 
-If I detach an encrypted database, I will need to open the master key encryption with password to re-attach it or restore it
+If I detach an encrypted database, I will need to open the master key encryption with password 
+to re-attach it or restore it
 */
 --check if databases have TDE turned on
 SELECT DB_Name(database_id) As [DB Name], encryption_state, encryption_state_desc
@@ -54,8 +64,8 @@ SELECT * FROM sys.certificates;
 --SMK is created when SQL Server DB Engine is installed
 USE Master;
 IF NOT EXISTS 
-    (SELECT * FROM sys.symmetric_keys WHERE symmetric_key_id = 101)
-    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password123.' 
+	(SELECT * FROM sys.symmetric_keys WHERE symmetric_key_id = 101)
+		CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password123.' 
 GO
 
 --create a server level certificate that will be used by the database for encryption, encrypted using Database Master Key DMK
@@ -103,8 +113,9 @@ GO;
 --selecting from the database will not be affected, as long as the encryption certificate remains intact 
 
 
+--View encryption status of databases: (tempdb will be encrypted if any database has TDE turned on)
 --database encryption key can be mapped to the certificate stored in the master database on the thumbrpint column
-select d.name, key_algorithm, encryption_state_desc=
+SELECT d.name, key_algorithm, encryption_state_desc=
 	CASE encryption_state	
 		WHEN '0' THEN 'No Encryption'
 		WHEN '1' THEN 'Unencrypted'
@@ -114,23 +125,9 @@ select d.name, key_algorithm, encryption_state_desc=
 		WHEN '5' THEN 'Decryption in progress'
 		WHEN '6' THEN 'Protection change in progress'
 		ELSE 'No Status' END
-	from sys.dm_database_encryption_keys e 
+	FROM sys.dm_database_encryption_keys e 
 LEFT JOIN master.sys.certificates c ON e.encryptor_thumbprint=c.thumbprint
 inner join sys.databases d on d.database_id=e.database_id;
-
---view which databases are encrypted:
-select name, is_encrypted from sys.databases;
-
---view encrypted objects:
-SELECT object_name(id), encrypted FROM sys.syscomments GROUP BY encrypted;
-
-
-
-SELECT sp.type, sp.type_desc, COUNT(smsp.definition) AS UnencryptedObjects -- only non-null or unencrypted objects will be counted
-	 , COUNT(*)-COUNT(smsp.definition) AS EncryptedObjects, COUNT(*) AS Total
-FROM sys.all_objects sp LEFT JOIN sys.sql_modules smsp  ON smsp.object_id = sp.object_id
-WHERE sp.type IN ('FN', 'IF', 'V', 'TR', 'PC', 'TF', 'P') AND sp.is_ms_shipped = 0
-GROUP BY sp.type, sp.type_desc
 
 
 --to reset server encryption:
@@ -151,11 +148,11 @@ RESTORE CERTIFICATE testEncryption FROM FILE = 'C:\EncryptionCert.cert' WITH PRI
 
 
 --to change the encryption algorithm of the database encryption key
-USE CMS_Prod_App
+USE DB_Name
 GO
 ALTER DATABASE ENCRYPTION KEY  REGENERATE WITH ALGORITHM = AES_256;  
 /*  Will do a database encryption scan.  There will be an entry in the error log: 
-Beginning database encryption scan for database 'CMS_Prod_App'.
+Beginning database encryption scan for database 'DB_Name'.
 
 */
 
@@ -183,49 +180,3 @@ CREATE CERTIFICATE CustomerCertMKE  WITH SUBJECT = 'Customer Table Encryption b
 SELECT * FROM sys.certificates;
 
 
---now that we have a certificate for encryption, create the symmetric key that will be used to encrypt/decrypt column:
-CREATE SYMMETRIC KEY CustomerKey WITH ALGORITHM = AES_256 ENCRYPTION BY CERTIFICATE CustomerCertMKE;
---OR   encrypt with password:
-CREATE SYMMETRIC KEY CustomerKey WITH ALGORITHM = AES_256 ENCRYPTION BY PASSWORD ='Password123';
-
-GO
-
--- Create a column in which to store the encrypted data.
-ALTER TABLE customers ADD CC_Encrypted varbinary(1500); 
-GO
-ALTER TABLE customers DROP COLUMN CC_Encrypted;
-
-select * from customers;
-
--- Open the symmetric key with which to encrypt the data.
-OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE CustomerCert WITH PASSWORD='Password123.';
---OR
-OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE CustomerCertMKE;
-
-
--- Encrypt the value in column using the symmetric key, save the result in another column  
-UPDATE customers SET CC_Encrypted = EncryptByKey(Key_GUID('CustomerKey'), CC);
-GO
-
-CLOSE SYMMETRIC KEY CustomerKey;
-
--- Verify the encryption.
--- First, open the symmetric key with which to decrypt the data.
-
-OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE MerchantCert WITH PASSWORD='Password123.';
-GO
-
--- Now list the original card number, the encrypted card number,
--- and the decrypted ciphertext. If the decryption worked,
--- the original number will match the decrypted number.
-
-SELECT cc, CC_Encrypted AS 'Encrypted CC', CONVERT(char,DecryptByKey(CC_Encrypted))AS 'Decrypted CC' FROM customers;
-GO
-SELECT * FROM customers;
-
---to remove encryption, first the encrypted data must be dropped, then the symmetric key, certificate, and master key in that order
-DROP TABLE customers;
-
-DROP SYMMETRIC KEY CustomerKey;
-DROP CERTIFICATE CustomerCert;
-DROP MASTER KEY;
