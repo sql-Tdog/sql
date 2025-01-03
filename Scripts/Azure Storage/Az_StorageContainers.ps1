@@ -12,11 +12,11 @@ Import-Module -Name Az
 Update-Module -Name Az
 
 
-$resourceGroup=''
-$storageAccountName1=''
-$containerName=''
-$managedIdentity=''
-$managedIdClientId = ''
+$resourceGroup=""
+$storageAccountName1=""
+$containerName=""
+$managedIdentity=""
+$managedIdClientId = ""
 $policyName='DBBackup'
 
 # Connect to Azure with user-managed-assigned managed identity

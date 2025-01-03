@@ -47,3 +47,21 @@ $allocationUnit = 65536
 $DiskCount = $PhysicalDisks.count
   
 New-StoragePool -FriendlyName "SQLDATAPOOL" -StorageSubsystemFriendlyName "Windows Storage*" -PhysicalDisks $PhysicalDisks | New-VirtualDisk -FriendlyName "SQLDATA01" -Interleave $StripeSize -NumberOfColumns $DiskCount -ResiliencySettingName simple –UseMaximumSize |Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -DriveLetter "G" -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLDATA01" -AllocationUnitSize $allocationUnit -Confirm:$false -UseLargeFRS
+
+
+#Export data of all drives on server:
+@{
+    StoragePools=Get-StoragePool    
+    PhysicalDisks=Get-PhysicalDisk
+    VirtualDisks=Get-VirtualDisk   
+    StorageTiers=Get-StorageTier    
+    StorageJobs=Get-StorageJob    
+    Disks=Get-Disk    
+    Partitions=Get-Partition    
+    Volumes=Get-Volume    
+    ClusterResource=Get-ClusterResource    
+    CSV=Get-ClusterSharedVolume    
+    SNV=Get-PhysicalDiskSNV    
+    ClusterNetwork =Get-ClusterNetwork
+    CluterNode=Get-ClusterNode
+    }|Export-Clixml-Path$HOME\cluster_diag_$env:computername.xml

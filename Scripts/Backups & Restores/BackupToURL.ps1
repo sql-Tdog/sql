@@ -3,14 +3,11 @@ Install-Module -Name Az -AllowClobber
 Update-Module -Name Az
 
 
-$subscriptionID=''
-$resourceGroup=''
-$storageAccountName=''
-$containerName=''
-$managedIdentity=''
-$managedIdClientId = ''
-$policyName='DBBackup'
-$AD="$Env:userdomain\$Env:username"
+$resourceGroup = ""
+$storageAccountName = ""
+$containerName = ""
+$managedIdClientId = ""
+$policyName = "DBBackup"
 
 #instances where we will be creating the SAS tokens:
 $inst1=""

@@ -8,13 +8,11 @@ we are not using MultiChannel because it is not compatible with geo-redundant st
 and we need geo-redundancy
 #>
 
-$managedIdentity="xx"
 $resourceGroup="xxx"
 $managedIdClientId = 'xx'
 $storageAccountName = ""
 $fileShareURL = $storageAccountName+".file.core.windows.net"
 $fileShare = ""
-$policyName="DBBackup"
 
 $inst1=""
 $inst2=""
