@@ -1,21 +1,18 @@
 <####
 This script is to move newly added secondary database files to the AG primary replica
 to a different location on the secondary replicas
-
 ####>
+
+#update variables on lines 7-10 and 32-33 because variables do not pass through to a new PS session
 $AG=""
 $db=""
 $inst=""
-$fileName="xxxLog1"
-$newFilePath="L:\MSSQL\Log\xxxLog1.ldf"
-
-
-
+$fileName=""
+$newFilePath="G:\MSSQL\Data\$filename.ndf"
 
 $Query="ALTER DATABASE $db SET HADR SUSPEND;
 ALTER DATABASE $db SET HADR OFF;
 " 
-  
 $Query
 Invoke-Sqlcmd -ServerInstance $inst -Query $Query 
 
@@ -25,8 +22,6 @@ GO
 "
 $Query
 Invoke-Sqlcmd -ServerInstance $inst -Query $Query 
-
-
 
 
 #move the files

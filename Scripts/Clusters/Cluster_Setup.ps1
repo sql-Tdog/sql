@@ -5,8 +5,6 @@ $inst1=""
 $inst2=""
 $primary_nic1=""
 $primary_nic2=""
-$list_ip1=""
-$list_ip2=""
 $clust1=""
 
 #check IP address of each node:
