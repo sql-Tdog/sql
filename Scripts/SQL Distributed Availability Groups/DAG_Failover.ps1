@@ -1,19 +1,18 @@
+<#*******************************************************************************
+In a distributed availability group, we can do a manual failover.  
+Automatic failovers are not supported because the replicas are in different Windows clusters.
+In a failover, the DAG becomes unavailable and all connections to the AG of the global primary replica 
+are terminated.
+
+In SQL 2022, REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT was introduced to guarantee no data loss in 
+the failover.
+#>
 $AG1=""
 $AG2=""
-
 $List1=""
 $List2=""
-
 $DAG=""
 
-
-<#*******************************************************************************
-In a distributed availability group, we can do a manual failover. 
-It does not support automatic failovers because the replicas are in different clusters.
-It modifies the DAG to become unavailable and all connections to the AG of the global primary replica will be terminated.
-
-In SQL 2022, REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT was introduced to guarantee no data loss in the failover.
-#>
 
 #To ensure no data is lost, set the DAG to Synchronous commit, let it synchronize, then failover
 #both AGs must have SYNCHRONOUS_COMMIT availability mode in order for the DAG to be in that mode:

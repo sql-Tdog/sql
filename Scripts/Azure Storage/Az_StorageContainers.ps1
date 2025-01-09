@@ -15,12 +15,10 @@ Update-Module -Name Az
 $resourceGroup=""
 $storageAccountName1=""
 $containerName=""
-$managedIdentity=""
-$managedIdClientId = ""
-$policyName='DBBackup'
+$UMIClientId = ""
 
 # Connect to Azure with user-managed-assigned managed identity
-$AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
+$AzureContext = (Connect-AzAccount -Identity -AccountId $UMIClientId).context 
 
 
 # set and store context
@@ -32,8 +30,6 @@ $StAccountKey=Get-AzStorageAccountKey -ResourceGroupName $resourceGroup -Name $s
 $AzStorageContext=New-AzStorageContext -StorageAccountName $storageAccountName1 -StorageAccountKey $StAccountKey[0].value 
 
 
-
-
 ######use Shared Access Signature Token to access storage container###############################################
 $sasToken=""
 $storageAccountName=""
@@ -43,9 +39,6 @@ $fileToUpload="C:\Temp\test.bak"
 
 $storageContext = New-AzStorageContext -StorageAccountName $storageAccountName -SasToken $sasToken
 Set-AzStorageBlobContent -File $fileToUpload -Container $containerName -Context $storageContext -Force
-
-
-
 
 
 #list blobls in a container:

@@ -8,8 +8,8 @@ we are not using MultiChannel because it is not compatible with geo-redundant st
 and we need geo-redundancy
 #>
 
-$resourceGroup="xxx"
-$managedIdClientId = 'xx'
+$resourceGroup=""
+$UMIClientId = ""
 $storageAccountName = ""
 $fileShareURL = $storageAccountName+".file.core.windows.net"
 $fileShare = ""
@@ -18,7 +18,7 @@ $inst1=""
 $inst2=""
 
 #connect to Azure with the user-managed-assigned Managed Identity
-$AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
+$AzureContext = (Connect-AzAccount -Identity -AccountId $UMIClientId).context 
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
 
