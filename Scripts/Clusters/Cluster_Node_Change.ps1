@@ -31,3 +31,5 @@ Get-ClusterNode -Cluster $clust1 | select name, nodeweight
 Get-ClusterGroup -Cluster $clust1
 Get-ClusterResource -Cluster $clust1
 
+#destroy cluster:
+Get-Cluster -Name $clust1 | Remove-Cluster -Force -CleanupAD
