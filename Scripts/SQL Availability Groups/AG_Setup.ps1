@@ -23,8 +23,16 @@ $fqdn=$env:userdnsdomain
 enable-SQLAlwaysOn -ServerInstance $inst1 -force
 enable-SQLAlwaysOn -ServerInstance $inst2 -force
 
-get-service -name SQLServerAgent -Computername $inst1 | Set-Service -Status Running
-get-service -name SQLServerAgent -Computername $inst2 | Set-Service -Status Running 
+get-service -name SQLServerAgent -Computername $inst1 | Restart-Service -Force
+get-service -name SQLServerAgent -Computername $inst2 | Restart-Service -Force
+
+#if the above fails with "SQL Server WMI provider not available"
+Enter-PSSession -ComputerName $inst2
+    Import-Module SQLPS
+    Set-Location SQLSERVER:\SQL
+    enable-SQLAlwaysOn 
+    get-service -name MSSQLSERVER | Restart-Service -Force
+Exit
 
  
 get-service -name SQLServerAgent, MSSQLSERVER -ComputerName $inst1
