@@ -23,17 +23,13 @@ $fqdn=$env:userdnsdomain
 enable-SQLAlwaysOn -ServerInstance $inst1 -force
 enable-SQLAlwaysOn -ServerInstance $inst2 -force
 
-get-service -name SQLServerAgent -Computername $inst1 | Restart-Service -Force
-get-service -name SQLServerAgent -Computername $inst2 | Restart-Service -Force
+get-service -name MSSQLSERVER -Computername $inst1 | Restart-Service -Force
+get-service -name MSSQLSERVER -Computername $inst2 | Restart-Service -Force
 
-#if the above fails with "SQL Server WMI provider not available"
-Enter-PSSession -ComputerName $inst2
-    Import-Module SQLPS
-    Set-Location SQLSERVER:\SQL
-    enable-SQLAlwaysOn 
-    get-service -name MSSQLSERVER | Restart-Service -Force
-Exit
+get-service -name SQLServerAgent -Computername $inst1 | Set-Service -Status Running 
+get-service -name SQLServerAgent -Computername $inst2 | Set-Service -Status Running 
 
+#if the above fails with "SQL Server WMI provider not available", it is most likely a firewall block
  
 get-service -name SQLServerAgent, MSSQLSERVER -ComputerName $inst1
 get-service -name SQLServerAgent, MSSQLSERVER -ComputerName $inst2
@@ -82,6 +78,10 @@ $primaryServer = get-item "SQLSERVER:\SQL\$inst1\DEFAULT"
 
 #create the AG:
 New-SqlAvailabilityGroup -Name $AGname1 -InputObject $primaryServer -AvailabilityReplica @($primaryReplica,$secondaryReplica)  
+
+#if New-SqlAvailabilityGroup fails with replica manager is waiting for the computer to start the WSFC:
+Start-ClusterNode -NodeName $inst1
+
 
 #set permissions for the AG:
 $Query="ALTER AUTHORIZATION ON AVAILABILITY GROUP::$AGname1 TO [$AD\$gmsaSQL1];

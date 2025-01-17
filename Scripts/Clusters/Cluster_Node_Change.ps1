@@ -4,8 +4,6 @@ $inst1=""
 $inst2=""
 $primary_nic1=""
 $primary_nic2=""
-$list_ip1=""
-$list_ip2=""
 $clust1=""
 
 Install-WindowsFeature –Name Failover-Clustering –IncludeManagementTools -ComputerName $inst1

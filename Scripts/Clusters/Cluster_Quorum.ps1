@@ -4,9 +4,7 @@ Update-Module Az.Storage
 
 $clust=""
 $storageAccountName=""
-$managedIdentity=""
 $managedIdClientId = ""
-$AD="$Env:userdomain\$Env:username"
 $resourceGroup=""
 
 # Connect to Azure with user-managed-assigned managed identity

@@ -38,3 +38,6 @@ Get-ClusterResource -Name "Cluster Name" | Get-ClusterParameter
 #lookup cluster IP addresses:
 $fqdn=$env:userdnsdomain
 nslookup "$clust1.$fqdn"
+
+#start cluster nodes (if syncing is needed)
+Start-ClusterNode -Name $inst1
