@@ -1,6 +1,10 @@
 <####
 This script is to set up read-only routing for AG replicas
 
+Remember that Read-only routing doesn't completely work for DAGs.  It can be configured for all 
+AGs but will work for the primary AG only.  It will not work for the secondary AGs.
+https://learn.microsoft.com/en-us/sql/database-engine/availability-groups/windows/distributed-availability-groups?view=sql-server-ver16#:~:text=Read%2Donly%20routing%20doesn%27t,the%20distributed%20availability%20group.
+
 ####>
 $AG=""
 $List=""

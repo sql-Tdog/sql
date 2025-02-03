@@ -1,4 +1,4 @@
-#nothing should be created in AD for AG, only for listener and cluster (no DNS records for AG)
+#nothing should be created in AD for AG, only DNS records for listener and cluster (no DNS records for AG)
 #there should be 2 NICs on each server: a primary NIC and a listener NIC
 #for listener, records should have listener_nic addresses 
 #for cluster, remove DNS records, there should be no records containing DNS

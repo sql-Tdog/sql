@@ -11,3 +11,11 @@ AND     ag.group_id = dhars.group_id
 LEFT JOIN sys.server_principals sp
 ON      ar.owner_sid = sp.sid
 WHERE   dhars.is_local = 1
+
+
+--view existing endpoints and their owners:
+SELECT  SUSER_NAME(principal_id) AS endpoint_owner, name AS endpoint_name, state_desc
+FROM sys.database_mirroring_endpoints;
+
+
+ALTER AUTHORIZATION ON ENDPOINT::Hadr_endpoint TO [CORP\Owner$];
