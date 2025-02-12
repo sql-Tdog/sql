@@ -1,3 +1,7 @@
+#get drive info
+Get-WmiObject -Class Win32_volume -Filter "Filesystem='NTFS'" -ComputerName 'FRASDB005' | Select-Object Name, Label, BlockSize, FreeSpace, Capacity | Format-Table -Autosize 
+
+
 #reset drives to uninitialized status:
 clear-disk -number 6 -RemoveData -Confirm:$False
 clear-disk -number 3 -RemoveData -Confirm:$False
