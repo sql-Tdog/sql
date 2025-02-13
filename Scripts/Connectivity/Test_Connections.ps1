@@ -10,3 +10,8 @@ Test-NetConnection localhost -port 5022
 
 #check to make sure TCP/IP protocol is enabled on the server
 #if not, "Access Denied" will be thrown when trying to connect 
+
+
+#Error: The target principal name is incorrect.  Cannot generate SSPI context.
+#check spn for SQL service account
+#may need to just uninstall and reinstall SQL, this resolved the error
