@@ -1,7 +1,8 @@
 <####
 Set up:  AG1 & AG2 in the first DAG and AG2 & AG3 in the second DAG
 Goal:  
-This script is to set up read-only routing for AG replicas
+This script is to switch AGs for the DAGs by tearing down both DAGs and recreating them
+with different underlying AGs
 
 ####>
 

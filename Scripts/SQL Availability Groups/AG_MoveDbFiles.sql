@@ -1,12 +1,14 @@
 /*
---*********To Move Data Files with Minimum Downtime*****************************************************************************
---For alwaysON HADR, we can only issue ALTER DATABASE commands without breaking HADR since database is in mirror/sync mode
---Detach/attach wil not work and backup/restore requires breaking from the HADR
+*********To Move Data Files with Minimum Downtime*****************************************************************************
+For alwaysON HADR, we can only issue ALTER DATABASE commands without breaking HADR since 
+the database is in mirror/sync mode
+Detach/attach wil not work and backup/restore requires breaking from the HADR
+*/
 
 --Execute in ***SQLCMD Mode**** so that I can connect to execute from different replicas seamlessly
 
 --idetify last full/transaction log backup across all replicas:
-:CONNECT p-biodswin01
+:CONNECT biodswin01
 select TOP 3 name 'database_name', backup_finish_date 'last_backup_date', [type], backup_size, backup_size/compressed_backup_size'compression_ratio'
 	, physical_device_name
 FROM sys.databases d
@@ -14,7 +16,7 @@ OUTER APPLY (SELECT TOP 1 database_name, server_name, backup_finish_date, [type]
 	WHERE database_name=d.name  ORDER BY backup_finish_date DESC) B
 LEFT JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id WHERE name='Datamart' ORDER BY last_backup_date DESC
 GO
-:CONNECT p-biodswin02
+:CONNECT biodswin02
 select TOP 3 name 'database_name', backup_finish_date 'last_backup_date', [type], backup_size, backup_size/compressed_backup_size'compression_ratio'
 	, physical_device_name
 FROM sys.databases d
@@ -22,7 +24,7 @@ OUTER APPLY (SELECT TOP 1 database_name, server_name, backup_finish_date, [type]
 	WHERE database_name=d.name ORDER BY backup_finish_date DESC) B
 LEFT JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id WHERE name='Datamart' ORDER BY last_backup_date DESC
 GO
-:CONNECT dr-biodswin01
+:CONNECT biodswin01
 select TOP 3 name 'database_name', backup_finish_date 'last_backup_date', [type], backup_size, backup_size/compressed_backup_size'compression_ratio'
 	, physical_device_name
 FROM sys.databases d
@@ -31,32 +33,18 @@ OUTER APPLY (SELECT TOP 3 database_name, server_name, backup_finish_date, [type]
 LEFT JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id WHERE name='Datamart' ORDER BY last_backup_date DESC
 GO
 
---before doing any work, take a log backup of the database and stop all backups during the activity time
+--before doing any work, take a log backup of the database and stop all backups
 --We should not break the backup chain else the restoration will not be possible
-:CONNECT dr-biodswin01
+:CONNECT biodswin01
 SELECT * FROM msdb.dbo.sysjobs where name='Backup_Datamart_Log';
 UPDATE msdb.dbo.sysjobs SET enabled=0 where name='Backup_Datamart_Log';
 GO
-:CONNECT p-biodswin02
+:CONNECT biodswin02
 SELECT * FROM msdb.dbo.sysjobs where name='Backup_Datamart_Log';
 UPDATE msdb.dbo.sysjobs SET enabled=0 where name='Backup_Datamart_Log';
 GO
 
---if I need to add a copy of replica:
-:CONNECT dr-biodswin01
---connect to secondary replica and restore backups with no recovery option, then join to the AG group:
-RESTORE DATABASE [Test_Cluster]  FROM  DISK = '\\p-biodswin01\BeforeAG\Test_Cluster.bak' WITH REPLACE, NORECOVERY;
-RESTORE DATABASE [Test_Cluster]  FROM  DISK = '\\p-biodswin01\BeforeAG\Test_Cluster.trn' WITH NORECOVERY;
-GO
-:CONNECT p-biodswin01
-ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'DR-BIODSWIN01' WITH 
-	(ENDPOINT_URL = 'TCP://DR-BIODSWIN01.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
-	SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
-:CONNECT dr-biodswin01
-ALTER AVAILABILITY GROUP [AG_Test] JOIN;  
-ALTER DATABASE Test_Cluster SET HADR AVAILABILITY GROUP=AG_Test;
 
-*/
 
 --check health:
 select replica_server_name, database_name, rs.synchronization_health_desc, log_send_queue_size, last_redone_time 
@@ -77,7 +65,8 @@ FROM sys.master_files a JOIN sys.databases b on a.database_id=b.database_id WHER
 SELECT db_name(a.database_id), a.name, a.physical_name, size/128.0 AS CurrentSizeMB
 FROM sys.master_files a JOIN sys.databases b on a.database_id=b.database_id WHERE db_name(a.database_id)='Datamart';
 
---on primary node, disallow connections and stop data movement to all secondary databases
+--for async replicas:
+--on primary node, disallow connections and stop data movement to all secondary databases to catch up
 :CONNECT p-biodswin01
 USE master
 GO
