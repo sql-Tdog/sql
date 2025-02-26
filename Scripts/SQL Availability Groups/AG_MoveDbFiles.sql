@@ -1,5 +1,5 @@
 /*
-*********To Move Data Files with Minimum Downtime*****************************************************************************
+*********To Move Data Files with Minimum Downtime for Async Nodes*************************
 For alwaysON HADR, we can only issue ALTER DATABASE commands without breaking HADR since 
 the database is in mirror/sync mode
 Detach/attach wil not work and backup/restore requires breaking from the HADR
@@ -33,8 +33,9 @@ OUTER APPLY (SELECT TOP 3 database_name, server_name, backup_finish_date, [type]
 LEFT JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id WHERE name='Datamart' ORDER BY last_backup_date DESC
 GO
 
---before doing any work, take a log backup of the database and stop all backups
+--Since we are going to be stopping SQL Services, stop all backups
 --We should not break the backup chain else the restoration will not be possible
+
 :CONNECT biodswin01
 SELECT * FROM msdb.dbo.sysjobs where name='Backup_Datamart_Log';
 UPDATE msdb.dbo.sysjobs SET enabled=0 where name='Backup_Datamart_Log';

@@ -13,6 +13,10 @@ ON      ar.owner_sid = sp.sid
 WHERE   dhars.is_local = 1
 
 
+--change owner of the AG:
+ALTER AUTHORIZATION ON AVAILABILITY GROUP::$AGname1 TO [sa]
+
+
 --view existing endpoints and their owners:
 SELECT  SUSER_NAME(principal_id) AS endpoint_owner, name AS endpoint_name, state_desc
 FROM sys.database_mirroring_endpoints;

@@ -1,6 +1,10 @@
 <####
 This script is to move newly added secondary database files to the AG primary replica
 to a different location on the secondary replicas
+
+
+Since we will be stopping SQL Services, stop t-log backups or we will have to restore any 
+backups taken during the work
 ####>
 
 #update variables on lines 7-10 and 32-33 because variables do not pass through to a new PS session
