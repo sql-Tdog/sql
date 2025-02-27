@@ -109,3 +109,5 @@ start-clusterresource -Cluster $clust1 -Name $AGName_Listener1
 Start-ClusterResource  -Cluster $clust1 -Name $AGname1
 
 
+#Possible listener error:
+# The specified IP Address 'xxx' is not valid in the cluster-allowed IP range.
