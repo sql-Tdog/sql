@@ -64,8 +64,8 @@ GO
 --Insert data into the table:
 OPEN SYMMETRIC KEY BackupContainer_Key DECRYPTION BY CERTIFICATE BackupContainer;
 
-DECLARE @VM varchar(100) = 'w3sqlseni01'
-DECLARE @key varbinary(1024) = ENCRYPTBYKEY(Key_GUID('BackupContainer_Key'),'6ot2ru9QztwhCdyN3TIJiGNTmuh2nj5VNgtssQrdl98qBzoavFafOzk+YHjz1LRuw0Ed7KiRokCi+AStyFtEIQ==')
+DECLARE @VM varchar(100) = 'xxxx'
+DECLARE @key varbinary(1024) = ENCRYPTBYKEY(Key_GUID('BackupContainer_Key'),'xxxxx')
 DECLARE @user varchar (100) =  ORIGINAL_LOGIN();
 DECLARE @today datetime = getdate()
 
