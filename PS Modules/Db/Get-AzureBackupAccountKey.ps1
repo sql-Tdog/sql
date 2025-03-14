@@ -1,9 +1,16 @@
 <#
 .SYNOPSIS
-This script retrieves keys to the Azure SQL Backup Containers.
+This function retrieves keys to the Azure SQL Backup Containers.  It uses the UMI assigned to the
+machine to access the key in Azure.  It can be run on a SQL Tools VM only.
+Required input is ComputerName.
 
 .DESCRIPTION
-The Get-AzureBackupAccountKey function is used to get a key for accessing Azure SQL Backup storage account.
+The Get-AzureBackupAccountKey function calls Get-Computer with the ComputerName input to
+retrieve the AzureRegion of the given machine.  Then, it calls Get-AzureComputerUMIClientId to
+get the client id of the User Managed Id assigned to the machines in this Azure region.  Then, if
+StorageAccountName is not provided, it calls Get-AzureStorageAccountName to get the Storage
+Account Name to where the SQL backups are to be taken.  Finally, it connects to Azure and returns the
+storage account key.
 
 .PARAMETER ServerInstance
 Specifies the name of the SQL Server VM to retrieve backup container key for.
@@ -24,8 +31,7 @@ function Get-AzureBackupAccountKey {
         [string] $ServerInstance,
 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [ValidateNotNullOrEmpty()]
-        [string] $StorageAccountKey,
+        [string] $StorageAccountName,
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
@@ -33,7 +39,6 @@ function Get-AzureBackupAccountKey {
 
         [Parameter(ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
-
         [string] $ComputerName = "*",
 
         [switch] $Force

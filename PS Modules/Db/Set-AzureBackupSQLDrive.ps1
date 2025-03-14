@@ -1,6 +1,8 @@
 <#
 .SYNOPSIS
 This script mounts a given Azure Storage Backup Container in SQL Server.
+Required input is ServerInstance.  The function calls Get-AzureBackupAccountKey if the
+StorageAccountKey or StorageAccountName parameters are not supplied.
 
 .DESCRIPTION
 The Set-AzureBackupSQLDrive function is used to mount a given Azure Storage Backup Container in SQL Server.
@@ -27,18 +29,17 @@ function Set-AzureBackupSQLDrive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [ValidateNotNullOrEmpty()]
         [string] $ServerInstance = "*",
-        
+
         [Parameter(ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string] $DomainName = (Get-Domain),
 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [ValidateNotNullOrEmpty()]
         $StorageAccountKey,
 
         [Parameter(ValueFromPipelineByPropertyName)]
-        [ValidateNotNullOrEmpty()]
         $StorageAccountName
    )
 
@@ -46,10 +47,13 @@ function Set-AzureBackupSQLDrive {
     }
 
     process {
-        if($StorageAccountKey -eq $null) {
-            $StorageAccountKey = Get-AzureBackupAccountKey -ServerInstance $ServerInstance
-            $StorageAccountName = [string]($StorageAccountKey.StorageAccountName)
-            $StorageAccountKey = [string]($StorageAccountKey.StorageAccountKey)
+        if(!$StorageAccountKey -or !$StorageAccountName) {
+            #retrieve the key from .dbo.BackupContainerKey table, not from Azure
+            $query = "EXEC dbo.GetBackupAccountKey @ServerInstance = '$ServerInstance'
+            "
+            $StorageAccountInfo = Get-InternalDatabase | New-DbConnection | New-DbCommand $query | Get-DbData
+            $StorageAccountName = [string]($StorageAccountInfo.StorageAccountName)
+            $StorageAccountKey = [string]($StorageAccountInfo.StorageAccountKey)
         }
         $FileShareURL = $StorageAccountName+".file.core.windows.net"
         $Fileshare = "backups"

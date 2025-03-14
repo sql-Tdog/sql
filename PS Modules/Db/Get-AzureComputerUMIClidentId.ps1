@@ -1,8 +1,11 @@
 <#
 .SYNOPSIS
-This script retrieves the User Assigned Managed Identity Client Id that can be used to access various resources in Azure.
-We assign a User Managed Identity (UMI) to all of our SQL Azure VMs including the SQL Tools VMs.  This UMI gives us access
-to Azure storage accounts among other things.
+This script retrieves the User Assigned Managed Identity Client Id that can be used to access
+various resources in Azure.  We assign a User Managed Identity (UMI) to our SQL Tools VMs only and
+with this UMI, we can get access to Azure storage accounts among other things from those VMs.
+This function can be called as stand alone on any machine but will normally be called by
+Get-AzureBackupAccountKey.
+Required inputs are AzureRegion and ComputerName.
 
 .DESCRIPTION
 The Get-AzureComputerUMIClientId function is used to get the User Assigned Managed Identity Client Id for accessing Azure resources.
@@ -71,11 +74,11 @@ function Get-AzureComputerUMIClientId {
                 }
             }
             $AzureRegion = $data.AzureRegion
-        } 
-        if($DomainName = "TKAD") {
+        }
+        if($DomainName -eq "TKAD") {
             $UMIClientId = '9bf00545-75f4-4f0e-9b8e-7c771fb28edc'
             $ResourceGroup = "MsfSqlfabricStorageDevUs"
-        } elseif ($DomainName = "CORP") {
+        } elseif ($DomainName -eq "CORP") {
             #in CORP, we have 3 different UMIs, based on environment
             if ($data.CategoryName -match "^Stage$") {
                 $UMIClientId = "94bf2c40-7767-4bea-8e77-1d8d622b1401"
@@ -85,7 +88,7 @@ function Get-AzureComputerUMIClientId {
                 $ResourceGroup = "MsfSqlfabricStorageDemoUs"
             } elseif ($data.CategoryName -match "^Production$") {
                 $UMIClientId = "465cca92-edda-43c4-96c0-e6e90f4cf05f"
-                $ResourceGroup = "MsfSqlUssProd" 
+                $ResourceGroup = "MsfSqlUssProd"
             }
         }
         [PSCustomObject] @{ UMIClientId = $UMIClientId; ResourceGroup = $ResourceGroup }

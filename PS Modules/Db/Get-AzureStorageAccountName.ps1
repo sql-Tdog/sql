@@ -1,15 +1,14 @@
 <#
 .SYNOPSIS
-This script retrieves the Azure Storage Account Name for a given Server with a required input of the User Managed Client Id that
-can be used to access the storage account.
-Expected inputs are AzureRegion, UMIClientId, and ResourceGroupName
+This script retrieves the Azure Storage Account Name for a given Server with a required input of
+the AzureRegion and ComputerName.
+This function can be run as stand alone on any machine but will normally be called by
+Get-AzureBackupAccountKey
 
 
 .DESCRIPTION
-The Get-AzureComputerUMIClientId function is used to get the User Assigned Managed Identity Client Id for accessing Azure resources.
+The Get-AzureStorageAccountName function is used to get the Azure Storage Account Name assigned to the VM for db backups.
 
-.PARAMETER ServerInstance
-Specifies the name of the Azure VM to retrieve UMI Client Id for.
 
 .EXAMPLE
 Get-AzureStorageAccountName -ServerInstance Server01 -AzureRegion WestUS3 -CategoryName Stage
@@ -30,11 +29,11 @@ function Get-AzureStorageAccountName {
         [ValidateNotNullOrEmpty()]
         [string] $DomainName = (Get-Domain),
 
-        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string] $AzureRegion = "*",
 
-        [Parameter(ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         $CategoryName,
 
         [Parameter(ValueFromPipelineByPropertyName)]
@@ -48,7 +47,7 @@ function Get-AzureStorageAccountName {
     }
 
     process {
-        if($DomainName = "TKAD") {
+        if($DomainName -eq "TKAD") {
             $StorageAccountName = switch ($AzureRegion) {
                 "USWest3" {
                     "sqlbackupwestus3wu3lsto"
@@ -57,7 +56,7 @@ function Get-AzureStorageAccountName {
                     "sqlbackupeastuseuslsto"
                 }
             }
-        } elseif ($DomainName = "CORP") {
+        } elseif ($DomainName -eq "CORP") {
             #in CORP, we have 3 different UMIs, based on environment
             if ($CategoryName -match "^Stage$") {
                 $StorageAccountName = switch ($AzureRegion) {
@@ -68,7 +67,7 @@ function Get-AzureStorageAccountName {
                         "sqlbackupdreusssto"
                     }
                 }
-            } elseif ($CategoryName -match "^Demo$") {
+            } elseif (CategoryName -match "^Demo$") {
                 $StorageAccountName = switch ($AzureRegion) {
                     "USWest3" {
                         "sqlbackupwu3dsto"
@@ -77,7 +76,7 @@ function Get-AzureStorageAccountName {
                         "sqlbackupdreusdsto"
                     }
                 }
-            } elseif ($CategoryName -match "^Production$") {
+            } elseif (CategoryName -match "^Production$") {
                 $StorageAccountName = switch ($AzureRegion) {
                     "USEast2" {
                         "sqlbackupwu3dsto"

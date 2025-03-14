@@ -117,7 +117,7 @@ GO
 -- and the decrypted ciphertext. If the decryption worked,
 -- the original number will match the decrypted number.
 
-SELECT cc, CC_Encrypted AS 'Encrypted CC', CONVERT(char,DecryptByKey(CC_Encrypted))AS 'Decrypted CC' FROM customers;
+SELECT CC, CC_Encrypted AS 'Encrypted CC', CONVERT(char,DecryptByKey(CC_Encrypted))AS 'Decrypted CC' FROM customers;
 GO
 SELECT * FROM customers;
 
