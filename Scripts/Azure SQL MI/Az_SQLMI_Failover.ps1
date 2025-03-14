@@ -1,29 +1,24 @@
-az login
-
-$subscriptionID="xxxxx"
-az account set -s $subscriptionID
-
-
-#####################################################################
-#to failover the primary SQL MI to another replica in the same region#
-#if there is only one replica in the region, the failover will occur but nothing will change#
-$SQLMI="xxxx"
-$SQLMIResourceGroup="xxx"
-az sql mi failover -g $SQLMIResourceGroup -n $SQLMI
-
-
 ################################Geo-Failover#############################
-#perform a cross region failover (no CLI, PS only for this part)
-#failover group must contain a secondary replica in another Azure region#
-#Failover group read-write listener
-#
-Install-Module -Name Az.Sql  
-Import-Module -Name Az.Accounts -RequiredVersion 2.19.0
+#https://learn.microsoft.com/en-us/cli/azure/sql/mi?view=azure-cli-latest#az-sql-mi-failover
 
-$AzureContext = (Connect-AzAccount -Subscription "microservices").context
+#perform a cross region failover (no CLI, PS only)
+#failover group must contain a secondary replica in another Azure region
+
+Install-Module -Name Az.Sql  
+Import-Module -Name Az.Accounts 
+
+#use a User Assigned Managed Identity with failover permissions to the SQL MI
+#managed identity details:
+$managedIdClientId ="9004cc76-df01-4062-a3fc-8d6573c06d63" 
+$subscription="Microservices-2" 
+
+#connect to Azure:
+$AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId -Subscription $subscription).context
 $AzureContext
+
+#SQL MI details:
 $SQLMIResourceGroup="xxx"
-$location="West Europe"
+$location="West Europe"  #current primary region
 $subscriptionID='xxxx'
 
 

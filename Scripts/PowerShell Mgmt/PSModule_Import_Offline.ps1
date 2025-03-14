@@ -7,6 +7,9 @@ Unblock-File -Path C:\SQL\az.11.2.0.nupkg
 #copy that folder to the PS module folder, check here:
 $env:PSModulePath.split(";")
 
+#if module was copied as a folder from another machine
+Install-Module -Name Az.accounts
+
 #for modules that have dependencies: main module gets its own folder, ie Az
 #dependencies are named Az.accounts, Az.storage, etc.
 #verify name of module folder is like this:  SqlServer>22.2.0

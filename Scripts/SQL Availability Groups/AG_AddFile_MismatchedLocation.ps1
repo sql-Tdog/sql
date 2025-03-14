@@ -4,7 +4,8 @@ we need to tell SQL Server to use a different location on this secondary.
 
 
 Once the file is added on the primary, the secondary database will go into suspended mode 
-immediately.  
+immediately.  What we need to do is take a t-log backup on the primary node and then restore it 
+on the secondary node with the MOVE option and move the new file to a new location
 ####>
 
 #check if file exists on all nodes:

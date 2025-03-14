@@ -7,6 +7,7 @@ Install-Module -Name Az.Storage
 Import-Module -Name Az.Accounts -RequiredVersion 3.0.0
 Import-Module -Name Az.Storage
 
+#managed identity details:
 $managedIdentity="MsfSqlfabricUserAssignedIdentityDeveu1"
 $managedIdClientId ="9004cc76-df01-4062-a3fc-8d6573c06d63"
 $subscription="Microservices-2"
