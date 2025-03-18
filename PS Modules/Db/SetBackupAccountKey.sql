@@ -9,7 +9,7 @@ BEGIN
 END
 GO
 
-ALTER PROCEDURE [dbo].[SetBackupAccountKey]
+CREATE OR ALTER PROCEDURE [dbo].[SetBackupAccountKey]
         @ServerInstance NVARCHAR(128),
         @AccountKey NVARCHAR(MAX),
         @StorageAccountName NVARCHAR(150),
@@ -47,9 +47,9 @@ BEGIN
                         o.ModifiedBy = @ModifiedBy,
                         o.ModifiedOn = @ModifiedOn
         WHEN    NOT MATCHED
-        THEN    INSERT (BackupGroupName,StorageAccountKey_Encrypted,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn)
-                VALUES (i.ServerInstance, i.AccountKey, @ModifiedBy, @ModifiedOn, @ModifiedBy, @ModifiedOn)
-        ;
+        THEN    INSERT (BackupGroupName,StorageAccountName,StorageAccountKey_Encrypted,CreatedBy,CreatedOn,ModifiedBy,ModifiedOn)
+                VALUES (i.ServerInstance, i.StorageAccountName, i.AccountKey, @ModifiedBy, @ModifiedOn, @ModifiedBy, @ModifiedOn)
+       ;
         CLOSE SYMMETRIC KEY BackupContainer_Key;
 END
 GO
