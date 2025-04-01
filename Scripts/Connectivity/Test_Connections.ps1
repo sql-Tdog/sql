@@ -1,9 +1,11 @@
 netstat -an |findstr -i 1433
+nslookup ipaddress
 
 #for SQL
 Test-NetConnection localhost -port 1433
 
 #for cluster:  port 3343
+Test-NetConnection clusterName -port 3343
 
 #for SQL AG:
 #running the tests below will fail against all listener NICs except the current primary
@@ -18,3 +20,6 @@ Test-NetConnection localhost -port 5022
 #Error: The target principal name is incorrect.  Cannot generate SSPI context.
 #check spn for SQL service account
 #may need to just uninstall and reinstall SQL, this resolved the error
+
+#testing speds between nodes:
+tracert tatk1r1s1db1a

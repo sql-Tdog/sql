@@ -12,15 +12,15 @@ nslookup $inst1
 nslookup $inst2
 
 #install the Failover Clustering feature
-Install-WindowsFeature –Name Failover-Clustering –IncludeManagementTools -ComputerName $inst1
-Install-WindowsFeature –Name Failover-Clustering –IncludeManagementTools -ComputerName $inst2
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst1
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst2
 
 #Check the nodes are good to cluster
 Test-Cluster -Node $inst1, $inst2 -Ignore Storage
 #check the validation report for any warnings
 
 #create cluster, specify no storage so that the storage doesn't get clustered
-New-Cluster –Name $clust1 –Node $inst1, $inst2 –StaticAddress $primary_nic1, $primary_nic2 -NoStorage
+New-Cluster -Name $clust1 -Node $inst1, $inst2 -StaticAddress $primary_nic1, $primary_nic2 -NoStorage
 
 #Set the cluster settings to standard
 (get-cluster).CrossSubnetThreshold = 10;
