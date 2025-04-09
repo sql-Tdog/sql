@@ -53,6 +53,12 @@ ALTER DATABASE Datamart SET HADR RESUME;
 ALTER DATABASE APP_ADMIN SET HADR RESUME;
 
 
+/**database is stuck, repeating messages:
+Nonqualified transactions are being rolled back in database SQLSentry for an Always On Availability 
+Groups state change. Estimated rollback completion: 0%. This is an informational message only. 
+No user action is required.  
+--reboot the server
+*/
 
 /**Error:  Database is stuck in “Initializing / In Recovery” and it is the primary replica of a 
 secondary AG of a DAG

@@ -34,6 +34,8 @@ certificates used for database level encryption.
 
 If I detach an encrypted database, I will need to open the master key encryption with password 
 to re-attach it or restore it
+
+For AGs, make sure the same 
 */
 --check if databases have TDE turned on
 SELECT DB_Name(database_id) As [DB Name], encryption_state, encryption_state_desc
@@ -69,7 +71,7 @@ IF NOT EXISTS
 GO
 
 --create a server level certificate that will be used by the database for encryption, encrypted using Database Master Key DMK
-CREATE CERTIFICATE testEncryption  WITH SUBJECT = 'Encryption Test';  --using DMK (more secure than just encrypting by password)
+CREATE CERTIFICATE testEncryption WITH SUBJECT = 'Encryption Test'; --using DMK (more secure than just encrypting by password)
 GO
 
 --OR:  encrypt using a password if a MASTER KEY is not going to be used:
@@ -79,6 +81,7 @@ GO
 
 --backup keys & certificates; if certificate is deleted and no backup exists, there will be no way of decrypting database files
 --to restore the database on a new server, we can copy the SMK, DMK, and Certificate backups
+--for databases in AGs, restore the same SMK so that the symmetric key can be opened without opening the database master key
 USE Master;
 GO
 BACKUP SERVICE MASTER KEY TO FILE = 'C:\SMK.key' ENCRYPTION BY PASSWORD='Password123.';
@@ -90,7 +93,7 @@ GO
 
 --to restore on a new server with a new database backup cert*************************************************************
 --1.  create a temporary backup cert on original server: (user password, MASTER KEY is not going to be used for encrypting the cert):
-CREATE CERTIFICATE testEncryption  ENCRYPTION BY PASSWORD='Password123.' WITH SUBJECT = 'Encryption Test';
+CREATE CERTIFICATE testEncryption ENCRYPTION BY PASSWORD='Password123.' WITH SUBJECT = 'Encryption Test';
 --2.  take a copy-only backup of the database encrypted with this backup cert:
 BACKUP DATABASE test_db TO @backupPath WITH COPY_ONLY, ENCRYPTION (ALGORITHM = AES_256, SERVER CERTIFICATE = BackupCert);
 --3.  create the same  cert on the new server and restore the database backup:
@@ -141,7 +144,7 @@ DROP MASTER KEY;
 
 --if using the same instance of SQL server, the Server Master Key does not need to be restored to get back the original encryption
 --we can simply re-create the DMK using the same password as before 
- CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password123.' 
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password123.' 
 --and restore the cert from file using the original password:
 RESTORE CERTIFICATE testEncryption FROM FILE = 'C:\EncryptionCert.cert' WITH PRIVATE KEY (FILE='C:\EncryptionCert.key', DECRYPTION BY PASSWORD='Password123.');
 --next, restore encrypted database backup
@@ -155,12 +158,6 @@ ALTER DATABASE ENCRYPTION KEY  REGENERATE WITH ALGORITHM = AES_256;
 Beginning database encryption scan for database 'DB_Name'.
 
 */
-
-
-EXEC xp_readerrorlog 0,1,"encr",NULL,NULL,NULL,'desc'
-sp_whoisactive
-
-RESTORE FILELISTONLY FROM DISK = N'U:\Backups\PDX1CMSDBAHP\Fin_Data\FULL\PDX1CMSDBAHP_Fin_Data_FULL_20230518_233000.bak';
 
 --Encrypt at the cell level (Column Level Encryption) ******************************************************************************************************************
 Use TestEncryption

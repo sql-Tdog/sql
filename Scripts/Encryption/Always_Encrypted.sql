@@ -73,7 +73,7 @@ select * from sys.column_encryption_keys ;
 select * from sys.column_master_keys;
 
 --view encrypted objects:
-SELECT object_name(id), encrypted FROM sys.syscomments GROUP BY encrypted;
+SELECT object_name(id), encrypted FROM sys.syscomments WHERE encrypted<>0;
 
 SELECT sp.type, sp.type_desc, COUNT(smsp.definition) AS UnencryptedObjects 
 -- only non-null or unencrypted objects will be counted
@@ -100,6 +100,24 @@ select * from customers;
 OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE CustomerCert WITH PASSWORD='Password123.';
 --OR
 OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE CustomerCertMKE;
+
+/*to make opening the symmetric key work on the database in a secondary replica of an AG, 
+the same SMK must be restored on the server by backing it up on the primary replica first
+otherwise, the database master key will have to be opened each time using decryption by password:
+*/
+BACKUP SERVICE MASTER KEY TO FILE = 'C:\Temp\ServerKey.key'  ENCRYPTION BY PASSWORD = 'Sg89ekl%ddosihlkghEfdPOIh33dewGd'
+RESTORE SERVICE MASTER KEY   FROM FILE = '\\w3pltsqltooli01\SQL\BackupCert\ServerKey.key'  DECRYPTION BY PASSWORD = 'Sg89ekl%ddosihlkghEfdPOIh33dewGd' FORCE
+GO
+
+--the force parameter will throw a message that all encrypted data will be deleted but it will not be
+--if the DMK for the database is not encrypted with the SMK, there will be no effect on the data
+--it needs to be encrypted with the SMK to allow opening of  symmetric key by certificate:
+ALTER MASTER KEY ADD ENCRYPTION BY SERVICE MASTER KEY
+GO
+OPEN SYMMETRIC KEY BackupContainer_Key DECRYPTION BY CERTIFICATE BackupContainer;
+
+SELECT name, is_master_key_encrypted_by_server FROM sys.databases
+
 
 
 -- Encrypt the value in column using the symmetric key, save the result in another column 
