@@ -20,7 +20,7 @@ Test-NetConnection -ComputerName $fileshareURL -Port 445
 Get-AzStorageFile -Context $ctx -ShareName $fileShare
 
 #view files in a directory:
-$path = ""
+$path = "SenClustD01-AGSenD01/SQLSentry/FULL_COPY_ONLY"
 Get-AzStorageFile -Context $ctx -ShareName $fileShare -Path $path | Get-AzStorageFile
 
 #view file sizes 

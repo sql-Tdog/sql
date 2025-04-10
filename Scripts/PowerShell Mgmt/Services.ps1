@@ -1,0 +1,1 @@
+get-service -ComputerName e1sqlsentry2s01 -name "*sentry*" | Restart-Service -force

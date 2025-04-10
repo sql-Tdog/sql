@@ -29,11 +29,6 @@ GO
 ALTER DATABASE DW_Base SET MULTI_USER;
 GO
 
-:CONNECT P1BNGBSN1S02
-DROP DATABASE DW_Base;
-
-alter availability group p1bngbsc1sag add database DW_Base
-
 
 --if I accidentally specify an incorrect location for the file move, I can re-issue the ALTER DATABASE stmt with the correct location and try 
 --to set the database back online again
@@ -45,8 +40,8 @@ ALTER DATABASE AspnetState_D6 MODIFY FILE (Name= AspnetState_dev6_log,  NEWNAME=
 
 
 **/ 
- 
- /** for system databases: except master and resource databases **
+
+/** for system databases: except master and resource databases **
  --1.  check current database name and location
 SELECT name, physical_name AS CurrentLocation, state_desc
 FROM sys.master_files
