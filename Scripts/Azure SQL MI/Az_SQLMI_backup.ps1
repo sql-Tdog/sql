@@ -1,4 +1,7 @@
-#for SQL MI: If Service-Managed Key is used for Transparent Data Encryption, an on-demand backup cannot be performed
+<#
+for SQL MI: If Service-Managed Key is used for Transparent Data Encryption, 
+an on-demand backup cannot be performed
+#>
 
 Install-Module -Name Az.Sql  
 Install-Module -Name Az.Accounts  

@@ -45,7 +45,7 @@ select * from sys.sql_logins;
 
 
 --create a new sql login:
-CREATE LOGIN sentryone WITH PASSWORD='m2[0N!VzAGSU#uPYAeYz7yDAy[M[ya'
+CREATE LOGIN sentryone WITH PASSWORD='xxx'
 --parameters such as DEFAULT_LANGUAGE, CHECK_EXPIRATION=OFF, CHECK_POLICY are not supported on Azure SQL DB
 
 ALTER SERVER ROLE ##MS_DatabaseConnector## ADD MEMBER sentryone

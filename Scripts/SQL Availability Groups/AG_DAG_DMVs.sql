@@ -1,5 +1,25 @@
 https://learn.microsoft.com/en-us/sql/database-engine/availability-groups/windows/distributed-availability-groups?view=sql-server-ver15#scale-out-readable-replicas
+/*
+Stuart Miller
+Mar 28, 2025, 7:49 PM
+to me
 
+There are a bunch of potentially nuanced details in defining exactly what "latency" means in an AG 
+scenario, and the engine does not monitor latency in real time for most of the ones that would 
+indicate a customer-side problem — most of them are intended to debug SQL internal problems.
+IMO, log_send_queue_size and redo_queue_size are the best approximations for "latency" as they 
+directly indicate how much data a given replica does not have [visible for queries], but they 
+do not have universally intuitive values like "one second". Values like last_sent_time will 
+intentionally drift for an idle DB that has no data to be sent; they can be extremely useful for 
+troubleshooting via time series comparisons of successive values but that's a bit too complicated 
+to stuff into an automated alert. For similar reasons, merely filtering out values where 
+log_send_queue_size is 0 can lead to false alerts for leading edges when workloads start up again 
+after an idle period, if you just happen to check during the polling period where the worker is 
+still asleep and thus hasn't consumed the available work yet.
+In the context of a DAG, I would expect to monitor *at least* every Forwarder in addition to the 
+global primary. Even the global primary does not have total visibility over all the leaf replicas. 
+
+*/
 -- shows replicas associated with availability groups
 SELECT
    ag.[name] AS [AG Name],
