@@ -53,17 +53,27 @@ ALTER DATABASE Datamart SET HADR RESUME;
 ALTER DATABASE APP_ADMIN SET HADR RESUME;
 
 
-/**database is stuck, repeating messages:
+/***********************Errors***************************************************
+--database is stuck, repeating messages:
 Nonqualified transactions are being rolled back in database SQLSentry for an Always On Availability 
 Groups state change. Estimated rollback completion: 0%. This is an informational message only. 
 No user action is required.  
 --reboot the server
-*/
 
-/**Error:  Database is stuck in “Initializing / In Recovery” and it is the primary replica of a 
+
+--Database is stuck in “Initializing / In Recovery” and it is the primary replica of a 
 secondary AG of a DAG
 Solution:  Restart the VM ->  database will go into Restoring mode -> restore t-logs ->add database 
 back to AG
+
+--Database is in "Reverting / In Recovery":
+--Reverting indicates the phase in the undo process when a secondary database is actively getting pages from the primary database
+SELECT [object_name],
+[counter_name], [cntr_value], instance_name
+FROM sys.dm_os_performance_counters
+WHERE [object_name] LIKE '%Database Replica%'
+AND [counter_name] = 'Log remaining for undo'
+
 */
 
 

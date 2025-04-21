@@ -1,3 +1,15 @@
+sp_whoisactive
+
+select * from sys.sysprocesses;
+
+sp_whoisactive @get_outer_command = 1
+
+use db
+GO
+EXEC sp_recompile @objname = 'dbo.ProName'
+
+
+/*
 select top 50 getdate() as logtime, rank() over (order by total_logical_reads+total_logical_writes desc,sql_handle,statement_start_offset ) as row_no
 ,       (rank() over (order by total_logical_reads+total_logical_writes desc,sql_handle,statement_start_offset ))%2 as l1
 ,       creation_time
@@ -21,3 +33,6 @@ cross apply sys.dm_exec_sql_text(sql_handle) st
 CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle)
 where total_logical_reads+total_logical_writes > 0 
 order by [AvgIO]  desc
+
+
+*/
