@@ -25,8 +25,8 @@ $StAccountKey=Get-AzStorageAccountKey -ResourceGroupName $resourceGroup -Name $s
 $AzStorageContext=New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $StAccountKey[0].value 
 
 #get container:
-$Azcontainer=Get-AzStorageContainer -Name $containerName -Context $AzStorageContext
-$cbc=$Azcontainer.CloudBlobContainer
+$Azcontainer = Get-AzStorageContainer -Name $containerName -Context $AzStorageContext
+$Azcontainer.CloudBlobContainer
 
 #for the first time: Set up a Stored Access Policy and a Shared Access Signature Token for the container  
 $policy = New-AzStorageContainerStoredAccessPolicy -Container $containerName -Context $AzStorageContext -Policy $policyName  -ExpiryTime $(Get-Date).ToUniversalTime().AddMonths(3) -Permission "rwld"
@@ -35,6 +35,6 @@ $policy = New-AzStorageContainerStoredAccessPolicy -Container $containerName -Co
 $policy = Get-AzStorageContainerStoredAccessPolicy -Container $containerName -Context $AzStorageContext -Policy $policyName
 $policy
 
-#create a credential in SQL server using the Shared Access Signature  
+#create the SAS token:
 $sas = New-AzStorageContainerSASToken -Policy $policyName -Context $AzStorageContext -Container $containerName
 $sas

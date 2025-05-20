@@ -38,16 +38,16 @@ $fileToUpload="C:\Temp\test.bak"
 
 
 $storageContext = New-AzStorageContext -StorageAccountName $storageAccountName -SasToken $sasToken
-Set-AzStorageBlobContent -File $fileToUpload -Container $containerName -Context $storageContext -Force
 
 
 #list blobls in a container:
-Get-AzStorageBlob -Container $containerName -Context $AzStorageContext 
+Get-AzStorageBlob -Container $containerName -Context $storageContext 
 #view names only:
 Get-AzStorageBlob -Container $containerName -Context $storageContext | Select Name
 
 #upload a file to the container:
-$AzStorageContext
+Set-AzStorageBlobContent -File $fileToUpload -Container $containerName -Context $storageContext -Force
+
 # upload a file to the default account (inferred) access tier
 $Blob1HT = @{
   File             = 'C:\Temp\import.csv'

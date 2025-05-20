@@ -13,4 +13,4 @@ $AzContainer="xxxx"
 $SASToken="xxxxx"
 $AzBlobContainer=""
 
-C:\Temp\azcopy\azcopy.exe copy $sourceFile "https://$AzContainer.blob.core.windows.net/$AzBlobContainer?$SASToken"
+C:\Temp\azcopy\azcopy.exe copy $sourceFile "https://$AzContainer.blob.core.windows.net/$AzBlobContainer`?$SASToken"

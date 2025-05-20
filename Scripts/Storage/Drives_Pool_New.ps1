@@ -19,6 +19,7 @@ Get-StorageSubSystem -FriendlyName "Windows Storage*" | Get-PhysicalDisk -CanPoo
 
 #get the LUN numbers of the disks that should be pooled:
 Get-PhysicalDisk | Where-Object CanPool -eq True | Sort -Property Size | Format-Table Size, PhysicalLocation
+Get-PhysicalDisk | Where-Object CanPool -eq True | Sort -Property Size | Format-Table Size, PhysicalLocation, SerialNumber
 
 $PhysicalDisksForPool = Get-PhysicalDisk -CanPool $True | Where-Object {$_.PhysicalLocation -match "LUN [678]"}
 $DiskCountForNumberOfColumns = $PhysicalDisksForPool.Count

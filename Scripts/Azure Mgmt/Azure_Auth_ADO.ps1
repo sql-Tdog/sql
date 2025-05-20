@@ -1,0 +1,3 @@
+Connect-AzAccount -ServicePrincipal -ApplicationId "9bf00545-75f4-4f0e-9b8e-7c771fb28edc" -FederatedToken $(Get-Content  $env:AZURE_FEDERATED_TOKEN_FILE -raw) -Tenant $env:AZURE_TENANT_ID
+$access_token = (Get-AzAccessToken -ResourceUrl https://database.windows.net).Token
+Invoke-Sqlcmd -Query "SELECT * FROM sys.server_principals;" -ServerInstance "dev-sqlfabric--sqlmi-ps-s1-us.0152aad5eac5.database.windows.net" -AccessToken $access_token

@@ -15,7 +15,7 @@ Copy-Item -ToSession $b $CertPath -Destination E:\MSSQL\Backup\BackupCert.cert
 Copy-Item -ToSession $b $KeyPath -Destination E:\MSSQL\Backup\BackupCert.key
 
 
-#create Database Master Key (DMK), if one does not already exist:
+#create Database Master Key (SMK), if one does not already exist:
 $Query="IF NOT EXISTS 
    (SELECT * FROM sys.symmetric_keys WHERE symmetric_key_id = 101)
    CREATE MASTER KEY ENCRYPTION BY PASSWORD = '$DMKPass' 

@@ -1,0 +1,23 @@
+Prerequisites:
+Install Visual Studio Code
+
+ 
+Process:
+1.  Go to the hub web portal and open the repo to copy
+2.  Click on “Code” green button to copy the HTTPS for downloading the repo
+3.  Open command prompt
+4.  On the first run, create the source folder on C drive, then download the new repository
+5.  Later, to just download a repo, cd to “C:\source” and then run the git clone command 
+
+ 
+Code:
+
+cd "C:\"
+md  source
+git clone https://github.docusignhq.com/InfoFabric/sql-infra.git
+cd sql-infra
+dir
+git status
+
+
+ 
