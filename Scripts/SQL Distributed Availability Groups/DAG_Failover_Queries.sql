@@ -16,7 +16,7 @@ select ag.name, ag.is_distributed, ar.replica_server_name, ar.availability_mode_
      join sys.availability_replicas ar on ag.group_id=ar.group_id
      left join sys.dm_hadr_availability_replica_states ars
      on ars.replica_id=ar.replica_id
-     where name='DAGDSI02'
+     where name='DAGname'
 
 
 SELECT ag.name
@@ -28,4 +28,4 @@ SELECT ag.name
          , drs.last_hardened_lsn  
 FROM sys.dm_hadr_database_replica_states drs 
 INNER JOIN sys.availability_groups ag on drs.group_id = ag.group_id
-where db_name(drs.database_id)='Docusign' and ag.name IN ('AGDSI01','AGDSI02','DAGDSI02');
+where db_name(drs.database_id)='databaseName' and ag.name IN ('AGname');

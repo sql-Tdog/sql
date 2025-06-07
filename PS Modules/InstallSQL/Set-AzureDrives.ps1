@@ -14,7 +14,7 @@ Set-AzureDrives
 #>
 
 Function Set-AzureDrives {
-    Write-Host "Configure simple disks first: System, Log, Data, or TempDB.  Follow this SOP https://docusign.atlassian.net/wiki/spaces/SDO/pages/460029968/Install+SQL+on+Azure+VMs+Storage+Spaces+optional" -ForegroundColor Yellow
+    Write-Host "Configure simple disks first: System, Log, Data, or TempDB" -ForegroundColor Yellow
     try {
 
         # Kill off the ShellHWDetection service so we don't get the Explorer prompts to format drives

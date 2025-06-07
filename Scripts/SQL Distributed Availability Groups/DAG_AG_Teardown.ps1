@@ -27,7 +27,7 @@ $DAGname2=""
 
 $AD=$Env:userdomain
 $FQDN=$env:USERDNSDOMAIN
-
+$db="databaseName"
 
 #tear down DAG2 and AG3:
 $Query="DROP AVAILABILITY GROUP [$DAGname2]"
@@ -43,12 +43,10 @@ Invoke-Sqlcmd -ServerInstance $List1 -Query $Query -TrustServerCertificate
 Invoke-Sqlcmd -ServerInstance $List2 -Query $Query -TrustServerCertificate
 
 
-$Query="ALTER AVAILABILITY GROUP [$AG2] REMOVE DATABASE DocuSign
-ALTER AVAILABILITY GROUP [$AG2] REMOVE DATABASE test_db"
+$Query="ALTER AVAILABILITY GROUP [$AG2] REMOVE DATABASE $db"
 Invoke-Sqlcmd -ServerInstance $List2 -Query $Query -TrustServerCertificate
 
-$Query="DROP DATABASE DocuSign
-DROP DATABASE test_db"
+$Query="DROP DATABASE $db"
 Invoke-Sqlcmd -ServerInstance $inst3 -Query $Query -TrustServerCertificate
 Invoke-Sqlcmd -ServerInstance $inst4 -Query $Query -TrustServerCertificate
 
