@@ -33,12 +33,12 @@ function Get-MediaLocation {
         $data =
         
         [PSCustomObject] @{
-            DomainName   = "CORP"
+            DomainName   = "xxx"
             Location     = "*"
             ComputerName = "xxx" #Stage, USWest3
         },
         [PSCustomObject] @{
-            DomainName   = "CORP"
+            DomainName   = "xxx"
             Location     = "*"
             ComputerName = "xxx" #Demo, USWest3
         }

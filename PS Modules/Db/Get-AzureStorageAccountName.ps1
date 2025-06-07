@@ -47,42 +47,42 @@ function Get-AzureStorageAccountName {
     }
 
     process {
-        if($DomainName -eq "TKAD") {
+        if($DomainName -eq "xxx1") {
             $StorageAccountName = switch ($AzureRegion) {
                 "USWest3" {
-                    "sqlbackupwestus3wu3lsto"
+                    "xxxx"
                 }
                 "USEast1" {
-                    "sqlbackupeastuseuslsto"
+                    "xxxx"
                 }
             }
-        } elseif ($DomainName -eq "CORP") {
+        } elseif ($DomainName -eq "xxx2") {
             #in CORP, we have 3 different UMIs, based on environment
             if ($CategoryName -match "^Stage$") {
                 $StorageAccountName = switch ($AzureRegion) {
                     "USWest3" {
-                        "sqlbackupwu3ssto"
+                        "xxxx"
                     }
                     "USEast1" {
-                        "sqlbackupdreusssto"
+                        "xxxx"
                     }
                 }
             } elseif (CategoryName -match "^Demo$") {
                 $StorageAccountName = switch ($AzureRegion) {
                     "USWest3" {
-                        "sqlbackupwu3dsto"
+                        "xxxx"
                     }
                     "USEast1" {
-                        "sqlbackupdreusdsto"
+                        "xxx"
                     }
                 }
             } elseif (CategoryName -match "^Production$") {
                 $StorageAccountName = switch ($AzureRegion) {
                     "USEast2" {
-                        "sqlbackupwu3dsto"
+                        "xxxx"
                     }
                     "USCentral" {
-                        "sqlbackupdreusdsto"
+                        "xxxxx"
                     }
                 }
             }
