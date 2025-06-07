@@ -123,7 +123,7 @@ DROP  TRIGGER TR_ALTERTABLE ON DATABASE
 --may need to turn it on for msdb as well (test this)
 USE master
 GO
-CREATE LOGIN [ServerStateViewer] WITH PASSWORD ='USscript#2.!@';
+CREATE LOGIN [ServerStateViewer] WITH PASSWORD ='xxx';
 GRANT VIEW SERVER STATE TO [ServerStateViewer];
 
 SELECT name,is_trustworthy_on FROM sys.databases
