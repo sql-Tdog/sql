@@ -2,28 +2,28 @@
 ALTER ENDPOINT Hadr_endpoint STATE=STARTED
 
 --to stop database from syncing: (this alone will not clear log on primary)
-ALTER  DATABASE Docusign SET HADR OFF
+ALTER  DATABASE database SET HADR OFF
 
 --to clear log on primary, remove replica or the database from the AG
 ALTER AVAILABILITY GROUP [AGName] REMOVE REPLICA on 'ServerName';
 
 
 --add database back:
-ALTER  DATABASE Docusign SET HADR AVAILABILITY GROUP = AGDSNA2P01
-ALTER  DATABASE Docusign SET HADR RESUME
+ALTER  DATABASE database SET HADR AVAILABILITY GROUP = AGDSNA2P01
+ALTER  DATABASE database SET HADR RESUME
 
 
 --if we have a bad replica that is either offline or can't keep up
 --remove the bad replica, then resume HADR if databases are not synchronizing
-ALTER AVAILABILITY GROUP AGDSNA2P01 REMOVE REPLICA ON  'cusqldsna2s5p01'
+ALTER AVAILABILITY GROUP AGName REMOVE REPLICA ON  'ServerName'
 --add it back:
-ALTER AVAILABILITY GROUP AGDSNA2P01 ADD REPLICA ON 'cusqldsna2s5p01' WITH 
-	(ENDPOINT_URL = 'TCP://cusqldsna2s5p01.CORP.DOCUSIGN.NET:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+ALTER AVAILABILITY GROUP AGName ADD REPLICA ON 'ServerName' WITH 
+	(ENDPOINT_URL = 'TCP://ServerName.fqdn:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 	SEEDING_MODE=MANUAL, SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 --from the added node:
-ALTER AVAILABILITY GROUP AGDSNA4P01 JOIN; 
+ALTER AVAILABILITY GROUP AGName JOIN; 
 --redo grants to create databases if in auto seeding mode:
-ALTER AVAILABILITY GROUP AGDSNA4P01 GRANT CREATE ANY DATABASE;;
+ALTER AVAILABILITY GROUP AGName GRANT CREATE ANY DATABASE;;
 
 
 --see if secondary replicas are ready for a failover:
@@ -40,17 +40,16 @@ select last_received_lsn, synchronization_state_desc, synchronization_health_des
 --to manually force failover an availability group to the replica I am currently connected to: all cluster nodes must be synchronized
 --otherwise, I can force failover with data loss only
 --to temporarily change the availability mode to synchronous commit:
-ALTER AVAILABILITY GROUP AG_Datamart MODIFY REPLICA ON N'servername' WITH (AVAILABILITY_MODE = SYNCHRONOUS_COMMIT);
-ALTER AVAILABILITY GROUP AG_Datamart FAILOVER; 
+ALTER AVAILABILITY GROUP AGname MODIFY REPLICA ON N'servername' WITH (AVAILABILITY_MODE = SYNCHRONOUS_COMMIT);
+ALTER AVAILABILITY GROUP AGname FAILOVER; 
 
 --for asynchronous commit mode, this is the only type of failover supported
 --the failover target will transition to the primary role and the remaining secondary databases, along with the former primary database, will be suspended
 --until I manually resume them individually
-ALTER AVAILABILITY GROUP AG_Datamart FORCE_FAILOVER_ALLOW_DATA_LOSS;     
+ALTER AVAILABILITY GROUP AGname FORCE_FAILOVER_ALLOW_DATA_LOSS;
 
 --after forced failover, resume secondary replicas (connect to secondary cluster nodes first)
 ALTER DATABASE Datamart SET HADR RESUME;
-ALTER DATABASE APP_ADMIN SET HADR RESUME;
 
 
 /***********************Errors***************************************************
@@ -79,9 +78,9 @@ AND [counter_name] = 'Log remaining for undo'
 
 --***to remove a database from a DAG temporarily and add it back later:
 --on the secondary replicas of the secondary AG:
-ALTER DATABASE Docusign SET HADR OFF;
+ALTER DATABASE Database SET HADR OFF;
 --repeat on the forwarder:
-ALTER DATABASE Docusign SET HADR OFF;
+ALTER DATABASE Database SET HADR OFF;
 
 --databases will go into restoring mode
 
@@ -91,7 +90,7 @@ ALTER DATABASE Docusign SET HADR OFF;
 --if we have 2 DAGs that connect databases in a linear fashion and want to restructure the DAG,
 --set HADR OFF first to prevent the 3rd linear AG from breaking from the 1st AG and staying in synchronized mode
 --execute on all secondary AG replicas (2nd AG & 3rd AG replicas)
-ALTER DATABASE Docusign SET HADR OFF;
+ALTER DATABASE Database SET HADR OFF;
 
 --tear down DAG that we no longer want:
 DROP AVAILABILITY GROUP [DAGname]
@@ -150,18 +149,18 @@ Fix:  GRANT CONNECT ON ENDPOINT:Hadr_Endpoint TO [SERVICEACCOUNT]
 
 
 --*******************synchronous commit mode*******************************************************************
-Error:  Always On Availability Groups data movement for database 'DocuSign' has been suspended for the following reason: "system" 
+Error:  Always On Availability Groups data movement for database 'Database' has been suspended for the following reason: "system" 
 (Source ID 4; Source string: 'SUSPEND_FROM_APPLY'). To resume data movement on the database, you will need to resume the database manually. 
 For information about how to resume an availability database, see SQL Server Books Online.
 This occurred because we ran out of space on the log disk.
 
 Repair:
-ALTER DATABASE Docusign SET HADR RESUME;
+ALTER DATABASE Database SET HADR RESUME;
 
 
 Error:  Database is in Not Synchronizing status
 Repair:
-ALTER DATABASE Docusign SET HADR RESUME;
+ALTER DATABASE database SET HADR RESUME;
 
 
 Error:  Database is stuck in “Initializing / In Recovery” and it is the rp

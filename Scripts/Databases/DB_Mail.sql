@@ -158,13 +158,13 @@ Another time, 2 of the dll files were missing and once I copied them from anothe
 /***********************script to configure mail specific to server name*************************************************
 
 declare @account varchar(55)
-set @account = replace(@@servername, '\' , '-')+'@kindercare.com'
+set @account = replace(@@servername, '\' , '-')+'@xxxx.com'
 EXEC msdb.dbo.sysmail_add_account_sp
 @account_name = @account,
 @description = ' Mail account for database mail',
 @email_address = @account,
 @display_name = @@servername ,
-@replyto_address = 'ITOpsAlert_SQLServerInfo_KCE@kindercare.com',
+@replyto_address = 'ITOpsAlert_SQLServerInfo_KCE@xxxx.com',
 @mailserver_name = 'smarty.corp.edu-resources.com';
 
 
@@ -191,7 +191,7 @@ Waitfor DELAY '00:00:04';
 
 EXEC msdb.dbo.sp_send_dbmail
     @profile_name = 'DBMail',
-    @recipients = 'fred.woolverton@Kindercare.com',
+    @recipients = 'name@domain.com',
 	@body = 'Testing new email profile.',
     @subject = 'Database Mail';
 
