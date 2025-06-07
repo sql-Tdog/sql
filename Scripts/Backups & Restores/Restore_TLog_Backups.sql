@@ -12,9 +12,8 @@ GO
 reconfigure;
 
 --get datetime of when full backup finished:
-:CONNECT TATK1R1S1DB1A
 SELECT TOP 1 backup_finish_date FROM msdb.dbo.backupset AS B INNER JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id
-WHERE database_name='docusign' and type='D' ORDER BY backup_start_date DESC
+WHERE database_name='xxx' and type='D' ORDER BY backup_start_date DESC
 
 --delete all files from the log folder:
 EXEC master.sys.xp_delete_files 'F:\share\DSLogs\*'

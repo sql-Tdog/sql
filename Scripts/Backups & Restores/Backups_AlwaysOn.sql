@@ -58,7 +58,7 @@ https://learn.microsoft.com/en-us/sql/database-engine/availability-groups/window
 --transaction log backups are not supported on any secondary AG replicas except for the forwarder
 --they can be taken on any replica of the primary AG or the primary replica of the secondary AG only
 --the following error will be thrown:
---Log backup for database "DocusignAPILog" on secondary replica failed because the new backup information could not be committed on primary database
+--Log backup for database "databaseAPILog" on secondary replica failed because the new backup information could not be committed on primary database
 
 
  --with a set up of AG1 and AG2 connected by DAG1, AG2 and AG3 connected by DAG2:

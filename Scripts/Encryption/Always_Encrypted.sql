@@ -105,8 +105,8 @@ OPEN SYMMETRIC KEY CustomerKey DECRYPTION BY CERTIFICATE CustomerCertMKE;
 the same SMK must be restored on the server by backing it up on the primary replica first
 otherwise, the database master key will have to be opened each time using decryption by password:
 */
-BACKUP SERVICE MASTER KEY TO FILE = 'C:\Temp\ServerKey.key'  ENCRYPTION BY PASSWORD = 'Sg89ekl%ddosihlkghEfdPOIh33dewGd'
-RESTORE SERVICE MASTER KEY   FROM FILE = '\\w3pltsqltooli01\SQL\BackupCert\ServerKey.key'  DECRYPTION BY PASSWORD = 'Sg89ekl%ddosihlkghEfdPOIh33dewGd' FORCE
+BACKUP SERVICE MASTER KEY TO FILE = 'C:\Temp\ServerKey.key'  ENCRYPTION BY PASSWORD = 'xxx'
+RESTORE SERVICE MASTER KEY   FROM FILE = '\\xxxx\SQL\BackupCert\ServerKey.key'  DECRYPTION BY PASSWORD = 'xxx' FORCE
 GO
 
 --the force parameter will throw a message that all encrypted data will be deleted but it will not be

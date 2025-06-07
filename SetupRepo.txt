@@ -14,7 +14,7 @@ Code:
 
 cd "C:\"
 md  source
-git clone https://github.docusignhq.com/InfoFabric/sql-infra.git
+git clone https://xxxx.git
 cd sql-infra
 dir
 git status

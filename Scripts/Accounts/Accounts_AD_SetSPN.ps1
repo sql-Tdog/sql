@@ -1,6 +1,6 @@
-$inst1="e1sqldseuss02"
-$inst2="e1sqldss02"
-$gmsaSQL="gmSqlDSS02$"
+$inst1="xxx"
+$inst2="xxx2"
+$gmsaSQL="gmsa$"
 $FQDN=$env:USERDNSDOMAIN
 
 
@@ -20,8 +20,7 @@ foreach($item in $array){
 $array =  @(
      "MSSQLSvc/$inst2.$FQDN:1433",
      "MSSQLSvc/$inst2.$FQDN",
-     "MSSQLSvc/$inst2:1433",
-     "MSSQLSvc/$inst2",
+     "MSSQLSvc/$inst2:1433"
 )
 foreach($item in $array){
     setspn -s $item $gmsaSQL
@@ -31,9 +30,4 @@ foreach($item in $array){
 
 #check if SPN is registered correctly:
 setspn -L $gmsaSQL 
-
-
-#set SPN
-setspn -S MSSQLSvc/$inst1.tkad.dsinfra.test:1433 TKAD\gmSqlI01$
-setspn -S MSSQLSvc/w3sqldswu3i02.tkad.dsinfra.test:1433 TKAD\gmSqlI01$
 

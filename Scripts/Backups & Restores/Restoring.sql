@@ -23,7 +23,7 @@ ALTER DATABASE EVEREST SET MULTI_USER WITH ROLLBACK IMMEDIATE
 RESTORE HEADERONLY FROM DISK='XX.BAK';
 --then look at 
 Select name, physical_name, create_lsn, redo_start_lsn from sys.master_files 
-where database_id=DB_ID('docusign') 
+where database_id=DB_ID('database') 
 
 --Let's look at files in the backups 
 RESTORE HEADERONLY FROM DISK = N'F:\SQL Backups\SalesTueRW.bak';
@@ -215,7 +215,7 @@ SELECT * FROM msdb.dbo.logmarkhistory;
 
 --*******************restore encrypted database:********************************************************
 USE Master
-OPEN MASTER KEY DECRYPTION BY PASSWORD = '23987hxJKL95tanya1210TNV4369#ghf0%lekjg5k3fd117r$$#1946kcj$n44ncjhdlj';
+OPEN MASTER KEY DECRYPTION BY PASSWORD = 'xxxxxxxxx';
 RESTORE DATABASE sttts FROM DISK ='C:\SQLData\backups\sttts.bak'
 	WITH MOVE 'sttts' TO 'C:\SQLData\sttts.mdf',MOVE 'sttts' TO 'C:\SQLData\sttts.ldf',RECOVERY,REPLACE
 	GO
@@ -226,12 +226,12 @@ CREATE DATABASE sttts ON ( FILENAME = N'C:\SQLData\sttts.mdf'), ( FILENAME = N'C
 --*********************to restore a database with TDE encryption on a new server**************************
 --The database can be restored on a new server without using the same SMK or DMK:
 --1. Create a DMK, it must be encrypted by a password (SMK is generated when SQL server is installed)
-CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'vmL223TW2W3jv3AlQ1gz' 
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'xxxxx' 
 --2.  Backup certs on the old servers
-BACKUP CERTIFICATE TDECert2 TO FILE = 'U:\Keys\TDECert2.cert' WITH PRIVATE KEY (file='U:\Keys\TDECert2.key', ENCRYPTION BY PASSWORD='Password123.#');
+BACKUP CERTIFICATE TDECert2 TO FILE = 'U:\Keys\TDECert2.cert' WITH PRIVATE KEY (file='U:\Keys\TDECert2.key', ENCRYPTION BY PASSWORD='xxx');
 --3.  Restore backup encryption certificate on the new server:
-CREATE CERTIFICATE BackupCert FROM FILE = '\\w3pltsqltools01\SQL\BackupCert\BackupCert.cert' WITH PRIVATE KEY (file='\\w3sqldbawu3i01\share\BackupCert.key', 
-	DECRYPTION BY PASSWORD='TracyOctonaut$33123Day'); 
+CREATE CERTIFICATE BackupCert FROM FILE = '\\xxxx\SQL\BackupCert\BackupCert.cert' WITH PRIVATE KEY (file='\\xxxx\share\BackupCert.key', 
+	DECRYPTION BY PASSWORD='xxx'); 
 
 --restore the database
 
@@ -239,23 +239,23 @@ CREATE CERTIFICATE BackupCert FROM FILE = '\\w3pltsqltools01\SQL\BackupCert\Back
 --second method, backup keys on the old server and copy them to the new one:
 USE Master;
 GO
-BACKUP SERVICE MASTER KEY TO FILE = 'U:\Backup\SMK.key' ENCRYPTION BY PASSWORD='Password123.#';
+BACKUP SERVICE MASTER KEY TO FILE = 'U:\Backup\SMK.key' ENCRYPTION BY PASSWORD='xxx';
 GO
 USE SSISDB
 GO
-BACKUP MASTER KEY TO FILE = 'U:\Backup\DMK.key' ENCRYPTION BY PASSWORD='Password123.#';
+BACKUP MASTER KEY TO FILE = 'U:\Backup\DMK.key' ENCRYPTION BY PASSWORD='xxx';
 GO
 	
 --on the new server:  restore encryption keys, create Certs, encrypt MK by SMK
-RESTORE SERVICE MASTER KEY FROM FILE ='U:\Keys\SMK.key' DECRYPTION BY PASSWORD ='Password123.#';
+RESTORE SERVICE MASTER KEY FROM FILE ='U:\Keys\SMK.key' DECRYPTION BY PASSWORD ='xxx';
 GO
-RESTORE MASTER KEY FROM FILE='U:\Keys\DMK.key' DECRYPTION BY PASSWORD='Password123.#' ENCRYPTION BY PASSWORD='Turbul3ntPhras3!&';
+RESTORE MASTER KEY FROM FILE='U:\Keys\DMK.key' DECRYPTION BY PASSWORD='xxx' ENCRYPTION BY PASSWORD='xxx';
 GO
-OPEN MASTER KEY DECRYPTION BY PASSWORD='Turbul3ntPhras3!&';
+OPEN MASTER KEY DECRYPTION BY PASSWORD='xxx';
 ALTER MASTER KEY ADD ENCRYPTION BY SERVICE MASTER KEY;  --encrypt MK by SMK so that opening the MK by password is not needed every time database is altered
 GO
 CREATE CERTIFICATE TDECert2 FROM FILE = 'U:\Keys\TDECert2.cert' WITH PRIVATE KEY (FILE='U:\Keys\TDECert2.key', DECRYPTION BY 
-	PASSWORD='Password123.#');
+	PASSWORD='xxx');
 GO
 
 
@@ -268,27 +268,6 @@ GO
 		MOVE 'Everest_log' TO 'C:\SQLData\Everest.ldf',
 		RECOVERY--,REPLACE
 	GO
-
- RESTORE DATABASE Everest_old
-	FROM DISK ='C:\SQLData\EVEREST_backup_2014_10_16_030000_9864527.bak'
-	WITH MOVE 'Everest' TO 'C:\SQLData\Everest_old.mdf',
-		MOVE 'Everest_log' TO 'C:\SQLData\Everest_old.ldf',
-		RECOVERY--,REPLACE
-	GO
-
- RESTORE DATABASE CCESBucket
-	FROM DISK ='K:\NavigatorsGrant\NavigatorsGrant_backup_2014_08_05_150001_8420437.trn'
-	WITH NORECOVERY
- GO
-
- RESTORE LOG NVtemp2
- 	FROM DISK ='G:\backups\NVtemp2\NavigatorsGrant_backup_2014_07_26_210002_9894152.trn'
-	WITH NORECOVERY
- GO
-  RESTORE LOG NVtemp2
- 	FROM DISK ='G:\backups\NVtemp2\NavigatorsGrant_backup_2014_07_27_070001_0947787.trn'
-	WITH RECOVERY
- GO
 
 
 --*****************to restore to a point in time*************************

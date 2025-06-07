@@ -17,7 +17,7 @@ is_auto_create_stats_incremental_on: disabled by default, recommend to enable if
 SELECT name, is_auto_create_stats_on, is_auto_update_stats_on, is_auto_update_stats_async_on, is_auto_create_stats_incremental_on
 FROM sys.databases;
 --set auto update 
-ALTER DATABASE DocusignCentral SET AUTO_UPDATE_STATISTICS_ASYNC ON
+ALTER DATABASE xxxx SET AUTO_UPDATE_STATISTICS_ASYNC ON
 
 
 SELECT sp.stats_id, object_name(stat.object_id), name, filter_definition, last_updated, rows, rows_sampled, steps, unfiltered_rows, modification_counter
@@ -42,8 +42,8 @@ ORDER BY s.stats_id, sc.column_id;
 /**
 SET STATISTICS IO ON
  
-ALTER DATABASE ipas SET AUTO_CREATE_STATISTICS ON;
-ALTER DATABASE SDGEESA SET AUTO_UPDATE_STATISTICS ON;
+ALTER DATABASE xxxx SET AUTO_CREATE_STATISTICS ON;
+ALTER DATABASE xxxx SET AUTO_UPDATE_STATISTICS ON;
 
  
 DBCC SHOW_STATISTICS ('dbo.Posts', ix_Posts_LastActivityDate) WITH HISTOGRAM;

@@ -12,8 +12,7 @@ $inst2=""
 
 
 #to create new AD Service Accounts:
-New-ADServiceAccount gmSqlI01 -ManagedPasswordIntervalInDays 1 -PrincipalsAllowedToRetrieveManagedPassword "SQL Server Service Accounts - TK1R1S1 DSDB" -DNSHostName "gmSqlI01.tkad.dsinfra.net"
-New-ADServiceAccount gmSqlIAgt01 -ManagedPasswordIntervalInDays 1 -PrincipalsAllowedToRetrieveManagedPassword "SQL Server Service Accounts - TK1R1S1 DSDB" -DNSHostName "gmSqlIAgt01.tkad.dsinfra.net"
+New-ADServiceAccount $gmsaSQL -ManagedPasswordIntervalInDays 1 -PrincipalsAllowedToRetrieveManagedPassword "SQL Server Service Accounts" -DNSHostName "gmSQL.$fqdn"
 
 
 
