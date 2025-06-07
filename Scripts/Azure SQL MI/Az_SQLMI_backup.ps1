@@ -11,24 +11,24 @@ Import-Module -Name Az.Accounts -RequiredVersion 3.0.0
 Import-Module -Name Az.Storage
 
 #managed identity details:
-$managedIdentity="MsfSqlfabricUserAssignedIdentityDeveu1"
-$managedIdClientId ="9004cc76-df01-4062-a3fc-8d6573c06d63"
-$subscription="Microservices-2"
+$managedIdentity="xxxx"
+$managedIdClientId ="xxxxx"
+$subscription="xxxx"
 
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId -Subscription $subscription).context
 $AzureContext
 
-$storageAccountRG="MsfSqleu1sDev"
-$storageAccountName="sqlbkp2euweulsto"
-$containerName="dsdb"
+$storageAccountRG="xxxx"
+$storageAccountName="xxxx"
+$containerName="xxx"
 
 $StAccountKey=Get-AzStorageAccountKey -ResourceGroupName $storageAccountRG -Name $storageAccountName 
 $AzStorageContext=New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $StAccountKey[0].value 
 $Azcontainer=Get-AzStorageContainer -Name $containerName -Context $AzStorageContext
 $cbc=$Azcontainer.CloudBlobContainer
 $policyName='DBBackup'
-$sourcedb="Docusign"
-$server="dev-sqlfabric--sqlmi-dsdb-s1-eu-p.9cfd33ed7782.database.windows.net"
+$sourcedb="database"
+$server="xxxx.database.windows.net"
 
 #for the first time: Set up a Stored Access Policy and a Shared Access Signature Token for the container  
 $policy = New-AzStorageContainerStoredAccessPolicy -Container $containerName -Context $AzStorageContext -Policy $policyName  -ExpiryTime $(Get-Date).ToUniversalTime().AddYears(2) -Permission "rwld"
@@ -47,13 +47,13 @@ Invoke-Sqlcmd -ServerInstance  -Query $tSql
 $tSql = "CREATE CREDENTIAL [{0}] WITH IDENTITY='$managedIdentity'" -f $cbc.Uri,$sas.TrimStart('?')   
 
 #to turn off TDE so that a copy_only backup can be taken:
-$tsql = "ALTER DATABASE Docusign SET ENCRYPTION OFF;"
+$tsql = "ALTER DATABASE database SET ENCRYPTION OFF;"
 Invoke-Sqlcmd -ServerInstance $server -Query $tSql 
 
 #Microsoft recommends restarting the instance after removing encryption
 #this will also remove encryption from tempdb
-$sqlMI="dev-sqlfabric--sqlmi-dsdb-s1-eu-p"
-$MIRG="msf-dev-sqlfabric--sqlmi-dsdb-s1-eu"
+$sqlMI="xxx1"
+$MIRG="xxx2"
 Stop-AzSqlInstance -Name $sqlMI  -ResourceGroupName $MIRG
 
 Start-AzSqlInstance -Name $sqlMI  -ResourceGroupName $MIRG

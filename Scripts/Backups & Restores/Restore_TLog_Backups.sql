@@ -26,7 +26,7 @@ xp_cmdshell 'powershell.exe -File F:\share\GetTLogBackups.ps1'
 
 
 DROP TABLE IF EXISTS #fileList
-DECLARE @AG nvarchar(100)='AGDSNA4P01'
+DECLARE @AG nvarchar(100)='AgName'
 DECLARE @dbName sysname 
 DECLARE @lastFullBackup NVARCHAR(500) 
 DECLARE @lastDiffBackup NVARCHAR(500) 
@@ -35,11 +35,11 @@ DECLARE @backupPath NVARCHAR(500)
 DECLARE @backupFile NVARCHAR(500) 
 CREATE TABLE #fileList  (backupFile NVARCHAR(255), depth int, isfile bit) 
 
-SET @dbName = 'DocusignAPILog' 
-SET @backupPath  ='D:\Temp\DocusignAPILog\' 
+SET @dbName = 'Database' 
+SET @backupPath  ='D:\Temp\Database\' 
 
 INSERT INTO #fileList(backupFile, depth, isfile) 
-EXEC master.sys.xp_dirtree 'D:\Temp\DocusignAPILog\', 1,1
+EXEC master.sys.xp_dirtree 'D:\Temp\Database\', 1,1
 
 
 DECLARE backupFiles CURSOR FOR  

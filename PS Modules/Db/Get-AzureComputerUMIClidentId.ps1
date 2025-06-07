@@ -75,20 +75,20 @@ function Get-AzureComputerUMIClientId {
             }
             $AzureRegion = $data.AzureRegion
         }
-        if($DomainName -eq "TKAD") {
-            $UMIClientId = '9bf00545-75f4-4f0e-9b8e-7c771fb28edc'
-            $ResourceGroup = "MsfSqlfabricStorageDevUs"
-        } elseif ($DomainName -eq "CORP") {
+        if($DomainName -eq "xx1") {
+            $UMIClientId = 'xxxx1'
+            $ResourceGroup = "xxx1"
+        } elseif ($DomainName -eq "xx2") {
             #in CORP, we have 3 different UMIs, based on environment
-            if ($data.CategoryName -match "^Stage$") {
-                $UMIClientId = "94bf2c40-7767-4bea-8e77-1d8d622b1401"
-                $ResourceGroup = "MsfSqlfabricStorageStageUs"
-            } elseif ($data.CategoryName -match "^Demo$") {
-                $UMIClientId = "9da21448-ec56-4e1c-a9e1-fb4ebafbcc93"
-                $ResourceGroup = "MsfSqlfabricStorageDemoUs"
+            if ($data.CategoryName -match "^xxxa$") {
+                $UMIClientId = "xxx2"
+                $ResourceGroup = "xxx2"
+            } elseif ($data.CategoryName -match "^xxxb$") {
+                $UMIClientId = "xxx3"
+                $ResourceGroup = "xxx3"
             } elseif ($data.CategoryName -match "^Production$") {
-                $UMIClientId = "465cca92-edda-43c4-96c0-e6e90f4cf05f"
-                $ResourceGroup = "MsfSqlUssProd"
+                $UMIClientId = "xxx4"
+                $ResourceGroup = "xxx4"
             }
         }
         [PSCustomObject] @{ UMIClientId = $UMIClientId; ResourceGroup = $ResourceGroup }
