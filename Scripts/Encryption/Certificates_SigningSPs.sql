@@ -23,7 +23,7 @@ GO
 
 use CertTest
 go
-CREATE CERTIFICATE TestClaimAmtCert ENCRYPTION BY PASSWORD = 'pGFD4bb925DGvbd2439587y'  
+CREATE CERTIFICATE TestClaimAmtCert ENCRYPTION BY PASSWORD = 'xxx'  
       WITH SUBJECT = 'Credit Rating Records Access',  EXPIRY_DATE = '12/05/2019';  
 GO  
 
@@ -44,7 +44,7 @@ BEGIN
 END  
 GO  
 ADD SIGNATURE TO TestClaimAmtSP   
-   BY CERTIFICATE TestClaimAmtCert WITH PASSWORD = 'pGFD4bb925DGvbd2439587y';  
+   BY CERTIFICATE TestClaimAmtCert WITH PASSWORD = 'xxx';  
 GO
 
 --next, create a user that would have the ownership chain associated with the certificate
