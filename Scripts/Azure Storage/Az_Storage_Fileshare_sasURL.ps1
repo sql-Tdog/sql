@@ -4,9 +4,17 @@ $managedIdClientId = "94bf2c40-7767-4bea-8e77-1d8d622b1401"
 $storageAccountName = "sqlbackupdreusssto"
 $fileShareURL = $storageAccountName+".file.core.windows.net"
 $fileShare = "backups"
+$subscription = "Microservices"
 
 #connect to Azure with the user-managed-assigned Managed Identity
+#new method:
+Az login --identity --allow-no-subscriptions
+$AzureContext = Set-AzContext -SubscriptionName $subscription  
+$AzureContext
+
+#old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
+
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
 

@@ -18,6 +18,10 @@ $containerName=""
 $UMIClientId = ""
 
 # Connect to Azure with user-managed-assigned managed identity
+#new method:
+Az login --identity --allow-no-subscriptions
+
+#old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $UMIClientId).context 
 
 

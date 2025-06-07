@@ -2,14 +2,14 @@
 --locate login:
 select principal_id,name, type_desc, is_disabled
 FROM sys.server_principals where type_desc IN('WINDOWS_LOGIN','SQL_LOGIN','SERVER_ROLE') 
-AND name LIKE '%CN130563%';
+
 
 --create a new login with windows authentication:
-CREATE LOGIN [CENTENE\tnikolaychuk] FROM WINDOWS;
-ALTER ROLE sysadmin ADD MEMBER [CENTENE\tnikolaychuk];
+CREATE LOGIN [Domain\Username] FROM WINDOWS;
+ALTER ROLE sysadmin ADD MEMBER [Domain\Username];
 
 --create a new account with sql authentication:
-CREATE LOGIN tnikolaychuk WITH PASSWORD='asdlkfhasd;kl';  --MUST_CHANGE
+CREATE LOGIN username WITH PASSWORD='xxxx';  
 
 
 --create a database user from an existing login account:
@@ -25,7 +25,7 @@ GO
 
 
 --change password expiration for a login:
-ALTER LOGIN [tnikolaychuk] WITH CHECK_EXPIRATION=OFF;
+ALTER LOGIN [test] WITH CHECK_EXPIRATION=OFF;
 
 --create logon trigger:
 CREATE TRIGGER sa_limitfailedattempts ON ALL SERVER WITH EXECUTE AS 'sa'

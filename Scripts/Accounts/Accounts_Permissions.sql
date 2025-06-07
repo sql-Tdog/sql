@@ -51,17 +51,17 @@ CONNECT ANY DATABASE:  does not grant any permission in any database beyond con
 VIEW ANY DATABASE:  view metadata that describes all databases, regardless of whether the user can actually see the database
 
 --if granting CONTROL SERVER permission, also deny the following:
-GRANT CONTROL SERVER TO [CENTENE\MPARKAR];
-DENY IMPERSONATE ANY LOGIN TO [CENTENE\MPARKAR];
-DENY ALTER ANY LOGIN TO [CENTENE\MPARKAR];
-DENY ALTER ANY SERVER ROLE TO [CENTENE\MPARKAR];
-DENY ALTER ANY SERVER AUDIT TO [CENTENE\MPARKAR];
-DENY ALTER ANY DATABASE AUDIT TO [CENTENE\MPARKAR];
+GRANT CONTROL SERVER TO [Domain\User];
+DENY IMPERSONATE ANY LOGIN TO [Domain\User];
+DENY ALTER ANY LOGIN TO [Domain\User];
+DENY ALTER ANY SERVER ROLE TO [Domain\User];
+DENY ALTER ANY SERVER AUDIT TO [Domain\User];
+DENY ALTER ANY DATABASE AUDIT TO [Domain\User];
 
 --view "my" permissions:
-EXECUTE AS LOGIN='CENTENE\MNILES';
+EXECUTE AS LOGIN='Domain\User';
 SELECT entity_name, permission_name FROM sys.fn_my_permissions(NULL, NULL)
-EXECUTE AS LOGIN='CENTENE\TNIKOLAYCHUK';
+EXECUTE AS LOGIN='Domain\User';
 
 SELECT USER_NAME();
 --view current login's database level permissions:
@@ -83,13 +83,13 @@ FROM sys.fn_my_permissions(NULL, NULL)
 --Before giving a user any rights to a database, create the database user from their login with a default schema specified
 --Adding users to database role without creating their user account will not let them connect to database unless they have a server login
 --Make sure to specify default schema to prevent any permission issues
-CREATE USER [CENTENE\CN121433] FROM LOGIN [CENTENE\CN121433] WITH DEFAULT_SCHEMA=[dbo];
+CREATE USER [Domain\User] FROM LOGIN [Domain\User] WITH DEFAULT_SCHEMA=[dbo];
 
 --to give user access to database DMVs:
 USE Datamart
 GO
-GRANT VIEW DATABASE STATE TO [CENTENE\ERX_Specialty_Analytics];
-GRANT SHOWPLAN TO [CENTENE\ERX_Specialty_Analytics];
+GRANT VIEW DATABASE STATE TO [Domain\User];
+GRANT SHOWPLAN TO [Domain\User];
 
 
 --------------remove database level permissions------------------------------------------
@@ -121,34 +121,25 @@ DROP Login test;
 --SQLAgentReaderRole:  All of the SQLAgentUserRole rights plus the ability to review multiserver jobs, their configurations and history
 --SQLAgentOperatorRole:  All of the SQLAgentReaderRole rights plus the ability to review operators, proxies and alerts; Execute, stop or start all local jobs; 
 --		delete the job history for any local job; Enable or disable all local jobs and schedules
-USE msdb
-GO
-CREATE USER [CENTENE\ERX_Specialty_Analytics] FROM LOGIN [CENTENE\ERX_Specialty_Analytics] WITH DEFAULT_SCHEMA=[dbo];  
---for 2008R2: sp_addrolemember 'SQLAgentReaderRole',[CENTENE\MPARKAR]
-ALTER ROLE SQLAgentUserRole ADD MEMBER [CENTENE\ERX_Specialty_Analytics]
-DROP USER test;
+
 
 --give user access to read the error log:
 GRANT EXECUTE ON master.sys.xp_readerrorlog TO [CENTENE\MPARKAR]
 
---SSIS permissions:
-USE SSISDB 
-GO
-CREATE USER [CENTENE\ERX_Specialty_Analytics] FROM LOGIN [CENTENE\ERX_Specialty_Analytics] WITH DEFAULT_SCHEMA=[dbo];  
-ALTER ROLE ssis_admin ADD MEMBER [];
+
 
 
 --to view database properties:
-GRANT VIEW DATABASE STATE TO [centene\cmonreal];
-GRANT VIEW DEFINITION TO [centene\mparkar];
+GRANT VIEW DATABASE STATE TO [Domain\User];
+GRANT VIEW DEFINITION TO [Domain\User];
 
 --if a user is in a windows group with read only access to the db  and has no personal database account, 
 --I can still give them rights to view stored procs in the database:
-GRANT VIEW DEFINITION on SCHEMA::dbo to [centene\cn158464]  
+GRANT VIEW DEFINITION on SCHEMA::dbo to [Domain\User]  
 
 --read only access to all stored procedures:
-CREATE USER [CENTENE\elslaughter] FROM LOGIN [CENTENE\elslaughter] WITH DEFAULT_SCHEMA=[dbo];
-GRANT VIEW DEFINITION TO [CENTENE\MPEREIRA];
+CREATE USER [Domain\User] FROM LOGIN [Domain\User] WITH DEFAULT_SCHEMA=[dbo];
+GRANT VIEW DEFINITION TO [Domain\User];
 
 --***********Database Roles*******************
 --don't use db_datareader or db_datawriter in SQL 2014+, instead, use GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::dbo TO user;
@@ -163,23 +154,23 @@ GRANT INSERT TO USRGRP_UNDERWRITING_READER;
 GRANT UPDATE TO USRGRP_UNDERWRITING_READER;
 
 GRANT SELECT ON FctMembership TO Datamart_Reader ;
-GRANT SELECT ON SCHEMA::PBMADM TO [CENTENE\MKUKAL];
+GRANT SELECT ON SCHEMA::PBMADM TO [Domain\User];
 
 
 
 --for 2008R2 and older:  sp_addrolemember 'db_owner','USRGRP_UNDERWRITING_ADMIN'
 CREATE ROLE USRGRP_UNDERWRITING_READER AUTHORIZATION dbo;
 
-ALTER USER [CENTENE\RMHANGO] WITH DEFAULT_SCHEMA=[dbo]
+ALTER USER [Domain\User] WITH DEFAULT_SCHEMA=[dbo]
 
-ALTER ROLE USRGRP_UNDERWRITING_ADMIN ADD MEMBER  [CENTENE\CHADJONES];
+ALTER ROLE USRGRP_UNDERWRITING_ADMIN ADD MEMBER  [Domain\User];
 
 
 sp_helprole 
 sp_helprolemember 
-sp_helpuser 'CENTENE\DW_USS_PHARM'
+sp_helpuser 'Domain\User'
 GO
-sp_helpuser 'CENTENE\DW_USS_ACCTG'
+sp_helpuser 'Domain\User'
 
 --view permissions given to custom database roles:
 SELECT DISTINCT rp.name, ObjectType = rp.type_desc, 
@@ -233,20 +224,20 @@ CREATE SCHEMA [analyst] AUTHORIZATION dbo;  --new schema with ownership belongi
 GRANT CREATE SCHEMA TO [USRGRP_UNDERWRITING_ADMIN]  --give user permission to create schemas
 
 GO
-GRANT ALTER ON SCHEMA :: dbo TO [CENTENE\REPORTS];
-GRANT select  TO [CENTENE\REPORTS];
-GRANT INSERT  TO [CENTENE\REPORTS];
-GRANT UPDATE  TO [CENTENE\REPORTS];
+GRANT ALTER ON SCHEMA :: dbo TO [Domain\User];
+GRANT select  TO [Domain\User];
+GRANT INSERT  TO [Domain\User];
+GRANT UPDATE  TO [Domain\User];
 GRANT CREATE VIEW  TO analyst;
-GRANT CREATE FUNCTION TO [CENTENE\REPORTS];
-GRANT CREATE PROCEDURE TO [CENTENE\REPORTS];
-GRANT DROP OBJECT TO [CENTENE\REPORTS]; 
+GRANT CREATE FUNCTION TO [Domain\User];
+GRANT CREATE PROCEDURE TO [Domain\User];
+GRANT DROP OBJECT TO [Domain\User]; 
 
 GRANT INSERT ON SCHEMA :: analyst to analyst;
 GRANT DELETE ON SCHEMA :: analyst to analyst;
 GRANT select ON SCHEMA :: analyst to analyst;
 GRANT CREATE FUNCTION TO analyst;
-GRANT EXECUTE TO [CENTENE\MPARKAR];
+GRANT EXECUTE TO [Domain\User];
 
 
 ALTER AUTHORIZATION ON SCHEMA:: mherring TO dbo;
@@ -262,57 +253,12 @@ EXECUTE AS USER='SSRS_User';
 SELECT * FROM INFORMATION_SCHEMA.TABLES
 REVERT;
 
-EXECUTE AS USER='CENTENE\elslaughter';
-SELECT * FROM ReportServer.dbo.Catalog;
-SELECT TOP 1 * FROM Datamart.dbo.FctMonthlyMembership;
-SELECT TOP 1 * FROM Datamart.dbo.DimDate;
---UPDATE Kansas SET PlanGroupHierarchy1=1600 where segalrecordid=18
-EXEC GROUP_CONCAT_DS;
-
-BEGIN TRANSACTION
-ROLLBACK TRANSACTION
-
-USE USRGRP_UNDERWRITING
-select top 1 * from datamart.dbo.fcttransactions; 
-sp_helpdb usrgrp_finance;
-dbcc showfilestats;
-sp_spaceused;
-CREATE TABLE test (id int)
-select  * from test;
-INSERT INTO test values ('1'),('2')
-DELETE FROM TEST
-drop table test
-CREATE VIEW testcort AS SELECT Id from test
-drop VIEW testcort
-
-REVERT;
-select * from sys.sysprocesses where loginame='CENTENE\rmhango'
 
 --Display current execution context.
 SELECT SUSER_NAME(), USER_NAME();
 
 
-CREATE FUNCTION vtest  (@value varchar(max))
-RETURNS varchar(max)
-AS
-BEGIN
-	DECLARE @Result varchar(max)
-	
-	SET @Result = RTRIM(LTRIM(@value))
 
-    RETURN CASE CHARINDEX(' ', @Result, 1)
-        WHEN 0 THEN @Result
-        ELSE SUBSTRING(@Result, 1, CHARINDEX(' ', @Result, 1) - 1) END
-END
-
-DROP FUNCTION vtest
-
-EXECUTE usp_Updatesite_getsites
-
-
---view orphaned user accounts:
-exec sp_change_users_login 'report'
-exec sp_helplogins 'mkukal'
 */
 /** see user permissions for objects in a database */
 --ObjectName will not be relevant if class_desc is SCHEMA
@@ -374,6 +320,6 @@ sys.database_role_members as dbrm on dbp.principal_Id=dbrm.member_principal_Id L
 sys.database_principals as dbp2 on dbrm.role_principal_id=dbp2.principal_id left join 
 sys.server_role_members as srm on sp.principal_id=srm.member_principal_id left join
 sys.server_principals as sp2 on srm.role_principal_id=sp2.principal_id
-where convert(char(25),dbp2.name) NOT IN ('Datamart_Reader          ','db_exec_datefunctions    ','db_datareader            ','db_datawriter            ')
- AND dbp.name like '%ribb%' or dbp.name like '%ribb%'
+where convert(char(25),dbp2.name) NOT IN ('Datamart_Reader,'db_datareader')
+AND dbp.name like '%ribb%' or dbp.name like '%ribb%'
 

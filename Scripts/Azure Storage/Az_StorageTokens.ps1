@@ -15,6 +15,10 @@ $containerName = ""
 $policyName='DBBackup'
 
 # Connect to Azure with user-managed-assigned managed identity
+#new method:
+Az login --identity --allow-no-subscriptions
+
+#old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
