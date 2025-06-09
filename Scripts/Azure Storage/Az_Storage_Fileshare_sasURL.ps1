@@ -1,10 +1,10 @@
-$managedIdentity="msfsqlfabricuserassignedidentitystageus"
-$resourceGroup="MsfSqlfabricStorageStageUs"
-$managedIdClientId = "94bf2c40-7767-4bea-8e77-1d8d622b1401"
-$storageAccountName = "sqlbackupdreusssto"
+$managedIdentity="xxx"
+$resourceGroup="xxx"
+$managedIdClientId = "xxx"
+$storageAccountName = "xxx"
 $fileShareURL = $storageAccountName+".file.core.windows.net"
-$fileShare = "backups"
-$subscription = "Microservices"
+$fileShare = "xxx"
+$subscription = "xxx"
 
 #connect to Azure with the user-managed-assigned Managed Identity
 #new method:

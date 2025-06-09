@@ -9,8 +9,8 @@ Import-Module -Name Az.Accounts
 
 #use a User Assigned Managed Identity with failover permissions to the SQL MI
 #managed identity details:
-$managedIdClientId ="9004cc76-df01-4062-a3fc-8d6573c06d63" 
-$subscription="Microservices-2" 
+$managedIdClientId ="xxx" 
+$subscription="xxx" 
 
 #connect to Azure:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId -Subscription $subscription).context
