@@ -49,24 +49,23 @@ GO
 CREATE AVAILABILITY GROUP [AG_Test]
 WITH (AUTOMATED_BACKUP_PREFERENCE = SECONDARY)
 FOR DATABASE [Test_Cluster]
-REPLICA ON N'P-BIODSWIN01' WITH (ENDPOINT_URL = N'TCP://P-BIODSWIN01.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, 
+REPLICA ON N'ServerName1' WITH (ENDPOINT_URL = N'TCP://ServerName1.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, 
 	BACKUP_PRIORITY = 50, SEEDING_MODE = AUTOMATIC, SECONDARY_ROLE(ALLOW_CONNECTIONS = NO)),
-	N'P-BIODSWIN02' WITH (ENDPOINT_URL = N'TCP://P-BIODSWIN02.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, 
+	N'ServerName2' WITH (ENDPOINT_URL = N'TCP://ServerName2.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, 
 	BACKUP_PRIORITY = 50, SEEDING_MODE = AUTOMATIC, SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 
 
 --important permissions:  run on all replicas
-ALTER AUTHORIZATION ON AVAILABILITY GROUP::AZAGtkintgrp TO [TKAD\gmSQAZAGTK$];
+ALTER AUTHORIZATION ON AVAILABILITY GROUP::AgName TO [Domain\gmSQL$];
 GO
-ALTER AVAILABILITY GROUP AZAGtkintgrp GRANT CREATE ANY DATABASE;
+ALTER AVAILABILITY GROUP AgName GRANT CREATE ANY DATABASE;
 
 
 --***************listener for synchronous commit mode*********************************************************
 --create a listener resource with a static IP address
-ALTER AVAILABILITY GROUP [A1CMSDBC1LAG]	ADD LISTENER N'P1BNGIMC1QAG' 
-	(WITH IP((N'10.4.19.63', N'255.255.255.0')), PORT=1433);
+ALTER AVAILABILITY GROUP [AgName]	ADD LISTENER N'ServerName' (WITH IP((N'10.4.19.63', N'255.255.255.0')), PORT=1433);
 
-ALTER AVAILABILITY GROUP AG_Datamart MODIFY REPLICA ON N'biodswin02' WITH (SEEDING_MODE = AUTOMATIC);
+ALTER AVAILABILITY GROUP AG_Datamart MODIFY REPLICA ON N'ServerName' WITH (SEEDING_MODE = AUTOMATIC);
 
 --make sure database is in FULL recovery mode:
 SELECT name, recovery_model_desc FROM sys.databases where database_id=db_id('Datamart');
@@ -79,14 +78,14 @@ BACKUP LOG Test_Cluster TO DISK ='L:\Test_Cluster.trn';
 GO
 
 --connect to secondary replicas and restore backups with no recovery option, then join to the AG group:
-RESTORE DATABASE [Datamart]  FROM  DISK = '\\p-biodswin02\Datamart\Datamart_20200217_1.bak', DISK = '\\p-biodswin02\Datamart\Datamart_20200217_2.bak',
-	DISK = '\\p-biodswin02\Datamart\Datamart_20200217_3.bak',DISK = '\\p-biodswin02\Datamart\Datamart_20200217_4.bak',
-	DISK = '\\p-biodswin02\Datamart\Datamart_20200217_5.bak',DISK = '\\p-biodswin02\Datamart\Datamart_20200217_6.bak',
-	DISK = '\\p-biodswin02\Datamart\Datamart_20200217_7.bak',DISK = '\\p-biodswin02\Datamart\Datamart_20200217_8.bak'
+RESTORE DATABASE [Datamart]  FROM  DISK = '\\ServerName2\Datamart\Datamart_20200217_1.bak', DISK = '\\ServerName2\Datamart\Datamart_20200217_2.bak',
+	DISK = '\\ServerName2\Datamart\Datamart_20200217_3.bak',DISK = '\\ServerName2\Datamart\Datamart_20200217_4.bak',
+	DISK = '\\ServerName2\Datamart\Datamart_20200217_5.bak',DISK = '\\ServerName2\Datamart\Datamart_20200217_6.bak',
+	DISK = '\\ServerName2\Datamart\Datamart_20200217_7.bak',DISK = '\\ServerName2\Datamart\Datamart_20200217_8.bak'
  WITH REPLACE, NORECOVERY;
-RESTORE DATABASE [Datamart]  FROM  DISK = '\\p-biodswin02\Datamart\Datamart_2020021712.trn' WITH NORECOVERY;
+RESTORE DATABASE [Datamart]  FROM  DISK = '\\ServerName2\Datamart\Datamart_2020021712.trn' WITH NORECOVERY;
 GO
-RESTORE DATABASE [Datamart]  FROM  DISK = '\\p-biodswin02\Datamart\Datamart_2020021713.trn' WITH NORECOVERY;
+RESTORE DATABASE [Datamart]  FROM  DISK = '\\ServerName2\Datamart\Datamart_2020021713.trn' WITH NORECOVERY;
 GO
 
 --***************************************************
@@ -97,8 +96,8 @@ GO
 --(this will allow all connections but the database will remain in read-only mode on the secondary replica)
 USE [master]
 GO
-ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'DR-BIODSWIN01' WITH 
-	(ENDPOINT_URL = 'TCP://DR-BIODSWIN01.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'ServerName1' WITH 
+	(ENDPOINT_URL = 'TCP://ServerName1.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 	SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 
 --connect to secondary replica and join:
@@ -114,9 +113,9 @@ A new transaction log has been taken on primary or other secondary and has not b
 
 
 --to REMOVE a primary database from an availability group:
-ALTER AVAILABILITY GROUP PDX1CMSDBCSAG REMOVE DATABASE CMS_S1_App;
+ALTER AVAILABILITY GROUP AG_Datamart REMOVE DATABASE CMS;
 
-ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'dr-biodswin01';
+ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'ServerName1';
 
 
 --see if secondary replicas are ready for a failover:
@@ -133,7 +132,7 @@ select last_received_lsn, synchronization_state_desc, synchronization_health_des
 --to manually force failover an availability group to the replica I am currently connected to: all cluster nodes must be synchronized
 --otherwise, I can force failover with data loss only
 --to temporarily change the availability mode to synchronous commit:
-ALTER AVAILABILITY GROUP AG_Datamart MODIFY REPLICA ON N'p-biodswin02' WITH (AVAILABILITY_MODE = SYNCHRONOUS_COMMIT);
+ALTER AVAILABILITY GROUP AG_Datamart MODIFY REPLICA ON N'ServerName2' WITH (AVAILABILITY_MODE = SYNCHRONOUS_COMMIT);
 ALTER AVAILABILITY GROUP AG_Datamart FAILOVER; 
 
 --for asynchronous commit mode, this is the only type of failover supported
@@ -233,10 +232,10 @@ single node, just restart SQL services.
 Error:  I added a file to the database and the path did not exist on secondary, database became "Not Synchronizing/Corrupt" on secondary
 Fix:
 --on primary:
-ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'dr-biodswin01';
+ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'ServerName1';
 --Create the path on secondary and then Add database back to the AG from the primary replica:
-ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'dr-biodswin01' WITH 
-(ENDPOINT_URL = 'TCP://dr-biodswin01.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'ServerName1' WITH 
+(ENDPOINT_URL = 'TCP://ServerName1.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 --Now, it's showing as "Restoring.."; from the secondary, add the database to the High Availability Gorup:
 ALTER AVAILABILITY GROUP [AG_Datamart] JOIN;
@@ -253,10 +252,10 @@ Fix:	Secondary is probably still applying logs from the primary and has not reac
 		SQL Services, the database will become unhealthy until all logs are applied and all checks are completed.  Check Error Log for % complete.
 
 
-Error:  A connection timeout has occurred while attempting to establish a connection to availability replica 'P-BIODSWIN01' with id [282A0E54-2519-4603-B680-4F8791142051]. 
+Error:  A connection timeout has occurred while attempting to establish a connection to availability replica 'ServerName1' with id [282A0E54-2519-4603-B680-4F8791142051]. 
 		Either a networking or firewall issue exists, or the endpoint address provided for the replica is not the database mirroring endpoint of the host server instance.
 Fix:  Reboot server that is throwing these errors.  
-	Occurred on 5/18/17 on dr-biodswin01 and reboot fixed the issue.  All availability replicas became healthy again.
+	Occurred on 5/18/17 on ServerName1 and reboot fixed the issue.  All availability replicas became healthy again.
 
 
 
@@ -275,20 +274,20 @@ ALTER DATABASE CMS_PreProd_App SET HADR RESUME;
 Fix Option 2:  Move database transaction log to bigger drive.  To do this, remove secondary database from the group and add it back once all files are in the right new locations.
 Esure that the log backups are disabled on all replicas so that the log file remains intact (not truncated), otherwise will need to perform a full backup and log backup
 and apply that to the secondary to re-initialize replica.
-	EXEC [p-biodswin02].msdb.dbo.sp_update_job  
+	EXEC [ServerName2].msdb.dbo.sp_update_job  
 		@job_name = N'Backup_Datamart_Log',  
 		@enabled = 0 ;  
 	GO 
-	EXEC [dr-biodswin01].msdb.dbo.sp_update_job  
+	EXEC [ServerName1].msdb.dbo.sp_update_job  
 		@job_name = N'Backup_Datamart_Log',  
 		@enabled = 0 ;  
 	GO 
 	--From primary, remove secondary replica from group:
 	ALTER DATABASE Test_Cluster SET HADR OFF;
-	ALTER AVAILABILITY GROUP [AG_Test] REMOVE REPLICA on 'p-biodswin02';
+	ALTER AVAILABILITY GROUP [AG_Test] REMOVE REPLICA on 'ServerName2';
 	--move files to the desired location
-	ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'P-BIODSWIN02' WITH 
-		(ENDPOINT_URL = 'TCP://P-BIODSWIN02.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+	ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'ServerName2' WITH 
+		(ENDPOINT_URL = 'TCP://ServerName2.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 		SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 	--from secondary:
 	ALTER AVAILABILITY GROUP [AG_Test] JOIN;
