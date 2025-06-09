@@ -45,22 +45,22 @@ select * from sys.sql_logins;
 
 
 --create a new sql login:
-CREATE LOGIN sentryone WITH PASSWORD='xxx'
+CREATE LOGIN testUser WITH PASSWORD='xxx'
 --parameters such as DEFAULT_LANGUAGE, CHECK_EXPIRATION=OFF, CHECK_POLICY are not supported on Azure SQL DB
 
-ALTER SERVER ROLE ##MS_DatabaseConnector## ADD MEMBER sentryone
-ALTER SERVER ROLE ##MS_SecurityDefinitionReader## ADD MEMBER sentryone
-ALTER SERVER ROLE ##MS_ServerStateManager## ADD MEMBER sentryone
-ALTER SERVER ROLE ##MS_DefinitionReader## ADD MEMBER sentryone
+ALTER SERVER ROLE ##MS_DatabaseConnector## ADD MEMBER testUser
+ALTER SERVER ROLE ##MS_SecurityDefinitionReader## ADD MEMBER testUser
+ALTER SERVER ROLE ##MS_ServerStateManager## ADD MEMBER testUser
+ALTER SERVER ROLE ##MS_DefinitionReader## ADD MEMBER testUser
 
 --while still in the context of the master database:
-CREATE USER sentryone FOR LOGIN sentryone
-ALTER ROLE dbmanager ADD MEMBER sentryone
-ALTER ROLE loginmanager ADD MEMBER sentryone
+CREATE USER testUser FOR LOGIN testUser
+ALTER ROLE dbmanager ADD MEMBER testUser
+ALTER ROLE loginmanager ADD MEMBER testUser
 
 --change context to user database:
-CREATE USER sentryone FOR LOGIN sentryone
-GRANT VIEW DATABASE PERFORMANCE STATE TO sentryone
+CREATE USER testUser FOR LOGIN testUser
+GRANT VIEW DATABASE PERFORMANCE STATE TO testUser
 
 
 SELECT    roles.principal_id                            AS RolePrincipalID
@@ -72,10 +72,10 @@ JOIN sys.database_principals AS roles
     ON database_role_members.role_principal_id = roles.principal_id  
 JOIN sys.database_principals AS members  
     ON database_role_members.member_principal_id = members.principal_id
-    WHERE members.name='sentryone'
+    WHERE members.name='testUser'
 GO
 
-SELECT * FROM fn_my_permissions('sentryone', 'USER');  
+SELECT * FROM fn_my_permissions('testUser', 'USER');  
 
 
 --server level permissions
@@ -88,5 +88,5 @@ LEFT JOIN sys.server_principals AS roles
     ON server_role_members.role_principal_id = roles.principal_id
 LEFT JOIN sys.sql_logins AS sql_logins
     ON server_role_members.member_principal_id = sql_logins.principal_id
-    WHERE sql_logins.name='sentryone'
+    WHERE sql_logins.name='testUser'
 GO
