@@ -1,6 +1,6 @@
-$resourceGroup="MsfSqlfabricStorageStageUs"
-$managedIdClientId = "94bf2c40-7767-4bea-8e77-1d8d622b1401"
-$storageAccountName = "sqlbackupdreusssto"
+$resourceGroup="xxx"
+$managedIdClientId = "xxx"
+$storageAccountName = "xxx"
 $fileShareURL = $storageAccountName+".file.core.windows.net"
 $fileShare = "backups"
 
@@ -23,7 +23,7 @@ $AzStorage = New-AzStorageContext -StorageAccountName $storageAccountName -SasTo
 $AzStorage
 $files=Get-AzStorageFile -Context $AzStorage -ShareName $fileShare -Path $path | Get-AzStorageFile 
 $files
-$Path = "SenClustS01-AGSenS01\Deeb\FULL_COPY_ONLY"
+$Path = "serverName\Deeb\FULL_COPY_ONLY"
 
 
 
