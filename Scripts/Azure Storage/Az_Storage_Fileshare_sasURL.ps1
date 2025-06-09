@@ -1,6 +1,7 @@
 $managedIdentity="xxx"
 $resourceGroup="xxx"
 $managedIdClientId = "xxx"
+$UMIClientId = "" #needed only if using the old method to connect to Azure with UMI
 $storageAccountName = "xxx"
 $fileShareURL = $storageAccountName+".file.core.windows.net"
 $fileShare = "xxx"
