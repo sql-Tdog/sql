@@ -2,11 +2,11 @@ az login
         
 $policies = @()
 #get the right subscription based on domain:
-$domain = "TKAD" 
-if ($domain -in "ADINTR2", "TKAD") {
-    $subscriptionName = "Microservices"
+$domain = "xxx" 
+if ($domain -in "xxx1", "xxx2") {
+    $subscriptionName = "Subscription1"
 } else {
-    $subscriptionName = "Microservices-Prod-2"
+    $subscriptionName = "Subscription2"
 }
 if ($subscriptionName) {
     Set-AzContext -Subscription $subscriptionName | Out-Null
