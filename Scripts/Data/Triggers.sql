@@ -31,7 +31,7 @@ ALTER TRIGGER trg_ServerLogonAudit ON ALL SERVER WITH EXECUTE AS 'sa' FOR LOGON 
 				ELSE UPDATE APP_ADMIN.dbo.[User_LastLogin] SET LastLogon=getDate(), ip=@ip WHERE UserName=ORIGINAL_LOGIN()
 	END 
 	IF APP_NAME() LIKE ('%Microsoft Office%') BEGIN
-		IF ORIGINAL_LOGIN() NOT IN ('SSRS_User', 'CENTENE\REPORTS') 
+		IF ORIGINAL_LOGIN() NOT IN ('SSRS_User', 'domain\REPORTS') 
 			BEGIN
 				ROLLBACK
 			END    
@@ -48,7 +48,7 @@ ALTER TRIGGER trg_ServerLogonAudit ON ALL SERVER WITH EXECUTE AS 'sa' FOR LOGON 
 		ELSE UPDATE APP_ADMIN.dbo.[User_LastLogin] SET LastLogon=getDate(), ip=@ip WHERE UserName=ORIGINAL_LOGIN()
 	END 
 	IF APP_NAME() LIKE ('%Microsoft Office%') BEGIN
-		IF ORIGINAL_LOGIN() NOT IN ('CENTENE\BRLONG', 'CENTENE\ERX_MED_D_REPORTING','SSRS_User') 
+		IF ORIGINAL_LOGIN() NOT IN ('domain\BRLONG', 'domain\ERX_MED_D_REPORTING','SSRS_User') 
 			BEGIN
 				ROLLBACK
 			END    

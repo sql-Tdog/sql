@@ -1,9 +1,5 @@
 use ReportServer
-GO
-EXECUTE AS USER='CENTENE\TAWEST';
-GO
-SELECT SUSER_NAME(), USER_NAME();
-GO
+
 ;WITH XMLNAMESPACES (
 DEFAULT 'http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition',
    'http://schemas.microsoft.com/SQLServer/reporting/reportdesigner' AS rd

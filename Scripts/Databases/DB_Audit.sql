@@ -4,7 +4,7 @@
 use master
 GO
 CREATE SERVER AUDIT Finance_Audit TO FILE (FILEPATH='E:\Audit\') WITH (QUEUE_DELAY=1000, ON_FAILURE=CONTINUE)  
-	WHERE server_principal_name<>'CENTENE\USSFOGLIGHT';
+	WHERE server_principal_name<>'domain\USSFOGLIGHT';
 
 
 To audit at the database level, create a Database Audit Specification in the scope of the database that needs to be audited and add appropriate Audit

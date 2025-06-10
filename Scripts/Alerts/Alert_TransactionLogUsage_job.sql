@@ -68,7 +68,7 @@ SET @body = @body + @xml + ''</table></body></html>''
  
 -- step 4: send email if a T-log exceeds threshold
 DECLARE @mail_profile varchar(300)=(SELECT TOP 1 name FROM msdb.dbo.sysmail_profile);
-DECLARE @recipient_emails varchar(600)=''tnikolaychuk@centene.com; dba@Envolvehealth.com'';
+DECLARE @recipient_emails varchar(600)=''user@domain.com; dba@domain.com'';
 DECLARE @subject nvarchar(600)=''ALERT: High T-Log Utilization on ''+@@SERVERNAME;
 
 if(@xml is not null)

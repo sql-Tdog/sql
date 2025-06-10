@@ -1,5 +1,5 @@
-$servername="Localhost"
-$SQLServer="erxpwssrs1000"
+$servername="xxx"
+$SQLServer="xxx"
 $sqldatabase="master"
 $Query="SELECT Path FROM FoldersToUpdate ORDER BY Path"
 
@@ -17,7 +17,7 @@ $adapter = New-Object -TypeName System.Data.SqlClient.SqlDataAdapter $command
 $dataset = New-Object -TypeName System.Data.DataSet
 $numrows = $adapter.Fill($dataset)
 $folders = ($dataset.Tables[0])
-$login = "CENTENE\BI ReportContentManager"
+$login = "domain\ReportContentManager"
 $role = $ssrs.ListRoles("Catalog",$null) | where-object {$_.name -eq "Content Manager"}
 
 #Get the namespace for use in later steps, needed to create objects using the Policy class
