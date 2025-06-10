@@ -211,10 +211,10 @@ If a failover cannot be performed in case the AG is single node, just restart SQ
 Error:  I added a file to the database and the path did not exist on secondary, database became "Not Synchronizing/Corrupt" on secondary
 Fix:
 --on primary:
-ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'dr-biodswin01';
+ALTER AVAILABILITY GROUP [AG_Datamart] REMOVE REPLICA on 'servername';
 --Create the path on secondary and then Add database back to the AG from the primary replica:
-ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'dr-biodswin01' WITH 
-(ENDPOINT_URL = 'TCP://dr-biodswin01.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+ALTER AVAILABILITY GROUP [AG_Datamart] ADD REPLICA ON 'servername' WITH 
+(ENDPOINT_URL = 'TCP://servername.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 --Now, it's showing as "Restoring.."; from the secondary, add the database to the High Availability Gorup:
 ALTER AVAILABILITY GROUP [AG_Datamart] JOIN;
@@ -234,7 +234,7 @@ Fix:	Secondary is probably still applying logs from the primary and has not reac
 Error:  A connection timeout has occurred while attempting to establish a connection to availability replica 'P-BIODSWIN01' with id [282A0E54-2519-4603-B680-4F8791142051]. 
 		Either a networking or firewall issue exists, or the endpoint address provided for the replica is not the database mirroring endpoint of the host server instance.
 Fix:  Reboot server that is throwing these errors.  
-	Occurred on 5/18/17 on dr-biodswin01 and reboot fixed the issue.  All availability replicas became healthy again.
+	Occurred on 5/18/17 on servername and reboot fixed the issue.  All availability replicas became healthy again.
 
 
 
@@ -259,7 +259,7 @@ and apply that to the secondary to re-initialize replica.
 		@job_name = N'Backup_Datamart_Log',  
 		@enabled = 0 ;  
 	GO 
-	EXEC [dr-biodswin01].msdb.dbo.sp_update_job  
+	EXEC [servername].msdb.dbo.sp_update_job  
 		@job_name = N'Backup_Datamart_Log',  
 		@enabled = 0 ;  
 	GO 
@@ -268,7 +268,7 @@ and apply that to the secondary to re-initialize replica.
 	ALTER AVAILABILITY GROUP [AG_Test] REMOVE REPLICA on 'p-biodswin02';
 	--move files to the desired location
 	ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'P-BIODSWIN02' WITH 
-		(ENDPOINT_URL = 'TCP://P-BIODSWIN02.centene.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+		(ENDPOINT_URL = 'TCP://P-BIODSWIN02.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 		SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 	--from secondary:
 	ALTER AVAILABILITY GROUP [AG_Test] JOIN;

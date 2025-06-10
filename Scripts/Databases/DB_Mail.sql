@@ -9,8 +9,7 @@ sysmail_help_profile_sp
 
 SELECT name FROM sysmail_profile;
 
-GRANT EXECUTE ON sysmail_help_profile_sp TO [CENTENE\ERX_Specialty_Analytics];
-GRANT EXECUTE ON sysmail_help_profile_sp TO [CENTENE\ERX_Specialty_Analytics];
+GRANT EXECUTE ON sysmail_help_profile_sp TO [Domain\UserGroup];
 
 --enable database mail:
 USE master
@@ -28,10 +27,10 @@ GO
 EXECUTE msdb.dbo.sysmail_add_account_sp
     @account_name = 'SQL_MAIL',
     @description = 'SQL Server Mail Account',
-    @email_address = 'tnikolaychuk@EnvolveHealth.com',
+    @email_address = 'user@domain.com',
     @display_name = 'SQL Server DBA',
-	@replyto_address = 'tnikolaychuk@EnvolveHealth.com',
-    @mailserver_name = 'mail.centene.com' ;
+	@replyto_address = 'user@domain.com',
+    @mailserver_name = 'mail.domain.com' ;
 
 --create a new profile:
 EXECUTE msdb.dbo.sysmail_add_profile_sp @profile_name = 'SQL_MAIL_Profile', @description = 'SQL Server Mail Profile';
@@ -89,31 +88,24 @@ N'SQL_MAIL_Profile'
 EXECUTE msdb.dbo.sysmail_update_account_sp 
 	@account_id=3
 	,@enable_ssl=1
-	,@username='ocortes@rhamail.com'
+	,@username='user@domain.com'
 	,@password=''
 
 EXECUTE msdb.dbo.sysmail_update_account_sp 
 	@account_id=1
 	,@mailserver_name ='DA2MailBE'
 
-GRANT EXECUTE ON sysmail_update_account_sp TO ocortes
+GRANT EXECUTE ON sysmail_update_account_sp TO user
 
 
-EXECUTE AS USER='CENTENE\RNICHOLS';
-sysmail_update_account_sp 
-	@account_id=4
-	,@username='ocortes@rhamail.com'
-	,@password=''
-
-REVERT;
 
 
-DENY EXECUTE ON sysmail_update_account_sp TO ocortes
+DENY EXECUTE ON sysmail_update_account_sp TO user
 
 --send test email
 EXEC msdb.dbo.sp_send_dbmail
     @profile_name		= 'SQL_MAIL_Profile',
-    @recipients			= 'tnikolaychuk@centene.com;',
+    @recipients			= 'user@domain.com;',
     @subject				= 'test email.',
     @body			= 'test email';
 
@@ -226,10 +218,10 @@ EXEC msdb.dbo.sp_send_dbmail
 REMOVE DATABASE ACCOUNTS AND PROFILE
 EXEC msdb.dbo.sysmail_delete_profileaccount_sp
     @profile_name = 'DBMail',  
-    @account_name = 'PDX1ITSQL1P@kindercare.com';
+    @account_name = 'email@domain.com';
 
 	EXECUTE msdb.dbo.sysmail_delete_account_sp
-    @account_name = 'PDX1ITSQL1P@kindercare.com';
+    @account_name = 'email@domain.com';
 
 	EXECUTE msdb.dbo.sysmail_delete_profile_sp
     @profile_name = 'DBMail';

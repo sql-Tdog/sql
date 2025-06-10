@@ -35,7 +35,7 @@ sp_helpsrvrolemember 'sysadmin';
 --view server level permissions:
 SELECT  [srvprin].[name] [server_principal], [srvprin].[type_desc] [principal_type], [srvperm].[permission_name], [srvperm].[state_desc]  
 	FROM [sys].[server_permissions] srvperm INNER JOIN [sys].[server_principals] srvprin ON [srvperm].[grantee_principal_id] = [srvprin].[principal_id] 
-	WHERE [srvprin].[type] IN ('S', 'U', 'G') AND [srvprin].[name]='CENTENE\MPARKAR'
+	WHERE [srvprin].[type] IN ('S', 'U', 'G') AND [srvprin].[name]='domain\user'
 	ORDER BY [server_principal], [permission_name]; 
 
 --*******SERVER LEVEL PERMISSIONS****************************************
@@ -124,7 +124,7 @@ DROP Login test;
 
 
 --give user access to read the error log:
-GRANT EXECUTE ON master.sys.xp_readerrorlog TO [CENTENE\MPARKAR]
+GRANT EXECUTE ON master.sys.xp_readerrorlog TO [domain\user]
 
 
 

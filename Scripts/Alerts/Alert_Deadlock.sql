@@ -101,7 +101,7 @@ SET @body = @body + @xml +'</table></body></html>'
 
 
 
-DECLARE @recipientsList varchar(8000)='tanya.nikolaychuk@kindercare.com';
+DECLARE @recipientsList varchar(8000)='user@domain.com';
 DECLARE @subject varchar(300)='Alert! Deadlock on '+@@SERVERNAME;
 DECLARE @mail_profile varchar(300)=(SELECT TOP 1 name FROM msdb.dbo.sysmail_profile);
 

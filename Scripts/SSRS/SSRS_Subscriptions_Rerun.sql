@@ -23,7 +23,8 @@ WHERE  --Subscriptions.NextRunTime between '11/3/18 12:00' and '11/4/18 00:00'
 [Catalog].Path like '%TAT/Daily PA TAT Report - New Rules%' 
 	and Subscriptions.Description NOT LIKE '%reject%'
 	--and Schedule.LastRunTime between '10/4/18' and '10/5/18'
-	--and LastStatus LIKE '%failure%error%' --and Subscriptions.Description='Send e-mail to Juan.F.Sosa@centene.com'
+	--and LastStatus LIKE '%failure%error%' 
+	--and Subscriptions.Description='Send e-mail to user@domain.com'
 
 SELECT * FROM #jobsTemp;
 
@@ -47,7 +48,7 @@ INNER JOIN Schedule ON ReportSchedule.ScheduleID = Schedule.ScheduleID
 INNER JOIN Subscriptions ON ReportSchedule.SubscriptionID = Subscriptions.SubscriptionID 
 INNER JOIN [Catalog] ON ReportSchedule.ReportID = [Catalog].ItemID AND Subscriptions.Report_OID = [Catalog].ItemID
 LEFT JOIN Users U ON U.UserID=Subscriptions.OwnerId
-WHERE U.Username IN ('CENTENE\KABROOKS') AND Subscriptions.LastRunTime BETWEEN '4/1/20' AND '4/7/20' AND (LastStatus LIKE 'Failure%' OR LastStatus LIKE 'An error%')
+WHERE U.Username IN ('domain\KABROOKS') AND Subscriptions.LastRunTime BETWEEN '4/1/20' AND '4/7/20' AND (LastStatus LIKE 'Failure%' OR LastStatus LIKE 'An error%')
 
 
 --update #jobs table to include the string to execute the job:

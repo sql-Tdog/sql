@@ -1,12 +1,12 @@
 DECLARE @stmt nvarchar(max);
 DECLARE @mail_profile varchar(300)=(SELECT TOP 1 name FROM msdb.dbo.sysmail_profile);
-DECLARE @recipient_emails varchar(600)='tnikolaychuk@centene.com';
+DECLARE @recipient_emails varchar(600)='user@domain.com';
 DECLARE @subject varchar(1000);
 EXEC msdb.dbo.sp_start_job 'DBA_WhoIsActive';
 WAITFOR DELAY '00:00:05'
 
-DECLARE @exempt_users varchar(max)='''sa'',''CENTENE\mfeeser'',''NT AUTHORITY\SYSTEM'',''CENTENE\reports'',
-	''CENTENE\TNIKOLAYCHUK'',''SSRS_User'',''CENTENE\USSFOGLIGHT''';
+DECLARE @exempt_users varchar(max)='''sa'',''domain\mfeeser'',''NT AUTHORITY\SYSTEM'',''domain\reports'',
+	''domain\user'',''SSRS_User'',''domain\USSFOGLIGHT''';
 DECLARE @collection_time datetime=(SELECT TOP 1 collection_time FROM master.dbo.whoisactive order by collection_time desc);
 DECLARE @run_time nchar(4);
 DECLARE @search nvarchar(max)='SELECT @runT=MAX(convert(int,substring([dd hh:mm:ss.mss],4,2))*60+convert(int,substring([dd hh:mm:ss.mss],7,2))) 

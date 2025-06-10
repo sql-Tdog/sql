@@ -75,7 +75,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Alert DB
 		@command=N'SET QUOTED_IDENTIFIER ON;
 DECLARE @blockingxml XML;
 DECLARE @mail_profile varchar(300)=(SELECT TOP 1 name FROM msdb.dbo.sysmail_profile);
-DECLARE @recipient_emails varchar(600)=''tanya.nikolaychuk@kindercare.com'';
+DECLARE @recipient_emails varchar(600)=''user@domain.com'';
 SELECT  @blockingxml = N''$(ESCAPE_SQUOTE(WMI(TextData)))'';
 
 CREATE TABLE #BlockingDetails
@@ -153,7 +153,7 @@ INSERT INTO DBAWork.dbo.BlockedEvents
 IF (SELECT d.c.value(''@spid'',''int'') FROM @blockingxml.nodes(''TextData/blocked-process-report/blocked-process/process'') d(c)) <>
 	(SELECT d.c.value(''@spid'',''int'') FROM @blockingxml.nodes(''TextData/blocked-process-report/blocking-process/process'') d(c))
 	BEGIN
-		DECLARE @recipientsList varchar(8000)=''tanya.nikolaychuk@kindercare.com'';
+		DECLARE @recipientsList varchar(8000)=''user@domain.com'';
 		DECLARE @subject varchar(300)=''Alert! Blocking on ''+@@SERVERNAME;
 		EXEC msdb.dbo.sp_send_dbmail
 			@profile_name		= @mail_profile, 

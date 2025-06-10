@@ -23,8 +23,8 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Audit Alert',
 		@delete_level=0, 
 		@description=N'Alert DBA when a certain action gets logged in the server audit.', 
 		@category_name=N'Internal Reports', 
-		@owner_login_name=N'CENTENE\TNIKOLAYCHUK', 
-		@notify_email_operator_name=N'tnikolaychuk', @job_id = @jobId OUTPUT
+		@owner_login_name=N'domain\user', 
+		@notify_email_operator_name=N'user', @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 /****** Object:  Step [Scan the audit file, send alert]    Script Date: 5/1/2018 2:47:41 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Scan the audit file, send alert', 
@@ -40,12 +40,12 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Scan the
 		@command=N'DECLARE @body varchar(max);
 IF  EXISTS (SELECT event_time,action_id,session_server_principal_name AS UserName,server_instance_name,database_name,schema_name,object_name,statement, *
 FROM sys.fn_get_audit_file(''E:\Audit\*.sqlaudit'', DEFAULT, DEFAULT) 
-WHERE statement LIKE''%impersonate%'' and session_server_principal_name<>''CENTENE\reports'') 
+WHERE statement LIKE''%impersonate%'' and session_server_principal_name<>''domain\reports'') 
 BEGIN
 	EXEC msdb.dbo.Sp_send_dbmail
 		@profile_name = ''SQL_MAIL_Profile'',
 		@body_format =''html'',
-		@recipients = ''tnikolaychuk@centene.com'',
+		@recipients = ''user@domain.com'',
 		@subject = ''ALERT: Impersonation occured on ERXDWBISB1500'',
 		@body= ''Impersonation has occured by an account other than the services account.  Check the audit log.'';
 END

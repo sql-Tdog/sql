@@ -47,7 +47,7 @@ TimeProcessing+TimeDataRetrieval+TimeRendering DESC
  
 --ExecutionLog2
 Select top 40 * from ExecutionLog2 with (nolock)
---where reportpath like'%ra3003%' --and username='CENTENE\AZALDANA' and format='excel'
+--where reportpath like'%ra3003%' --and username='domain\user' and format='excel'
 --where timestart>'12/1/2015'
 order by Timestart desc;
  
@@ -107,7 +107,7 @@ INNER JOIN Subscriptions  ON   ReportSchedule.SubscriptionID = Subscriptions.Sub
 INNER JOIN [Catalog]  ON   ReportSchedule.ReportID = [Catalog].ItemID 
 AND Subscriptions.Report_OID = [Catalog].ItemID
 WHERE
-  Subscriptions.DeliveryExtension = 'Report Server Email' and [Catalog].Path like '%/Users Folders/CENTENE RMHANGO/My Reports/Client Packet%'
+  Subscriptions.DeliveryExtension = 'Report Server Email' and [Catalog].Path like '%/Users Folders/domain RMHANGO/My Reports/Client Packet%'
  
 SELECT * FROM schedule
   */

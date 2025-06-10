@@ -35,7 +35,8 @@ SELECT CASE
        INNER JOIN Users USR
                ON PUR.UserID = USR.UserID
        INNER JOIN dbo.Roles RL
-               ON RL.RoleID = PUR.RoleID WHERE C.type=1 and usr.username NOT LIKE '%centene%' AND usr.username NOT LIKE '%p-birpt1%' and usr.username NOT LIKE '%builtin%'
-                     AND usr.username NOT LIKE 'usscript%'
+               ON RL.RoleID = PUR.RoleID 
+        WHERE C.type=1 and usr.username NOT LIKE '%domain%' 
+                AND usr.username NOT LIKE '%builtin%'
 ORDER  BY C.Path
  
