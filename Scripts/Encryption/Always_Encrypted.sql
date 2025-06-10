@@ -106,14 +106,25 @@ the same SMK must be restored on the server by backing it up on the primary repl
 otherwise, the database master key will have to be opened each time using decryption by password:
 */
 BACKUP SERVICE MASTER KEY TO FILE = 'C:\Temp\ServerKey.key'  ENCRYPTION BY PASSWORD = 'xxx'
+--sometimes, the restore throws an error...just restart SQL services, it should go away
 RESTORE SERVICE MASTER KEY   FROM FILE = '\\xxxx\SQL\BackupCert\ServerKey.key'  DECRYPTION BY PASSWORD = 'xxx' FORCE
 GO
 
 --the force parameter will throw a message that all encrypted data will be deleted but it will not be
 --if the DMK for the database is not encrypted with the SMK, there will be no effect on the data
---it needs to be encrypted with the SMK to allow opening of  symmetric key by certificate:
+--it needs to be encrypted with the SMK to allow opening of  symmetric key by certificate
+--to set up encryption for a database that already had encryption, go through the following process:
+DROP SYMMETRIC KEY Existing_Key 
+DROP CERTIFICATE ExistingCertificate
+DROP MASTER KEY
+
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password123';
 ALTER MASTER KEY ADD ENCRYPTION BY SERVICE MASTER KEY
 GO
+CREATE CERTIFICATE NewCert WITH SUBJECT = 'Azure Backup Cert'
+CREATE SYMMETRIC KEY NewCert_Key WITH ALGORITHM = AES_256 ENCRYPTION BY CERTIFICATE NewCert;
+
+--now, you can open the key with the cert:
 OPEN SYMMETRIC KEY BackupContainer_Key DECRYPTION BY CERTIFICATE BackupContainer;
 
 SELECT name, is_master_key_encrypted_by_server FROM sys.databases

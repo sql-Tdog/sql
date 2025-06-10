@@ -27,6 +27,10 @@ EXEC xp_dirtree '\\w3sqldbawu3i01\share\', 1,1
 EXEC xp_cmdshell 'dir *.exe';
 GO
 
+--view files on Z drive:
+EXEC xp_dirtree 'Z:\', 1,1
+
+
 
 USE [master]
 EXEC xp_cmdshell 'NET USE Z: /delete'
