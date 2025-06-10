@@ -31,3 +31,7 @@ foreach($item in $array){
 #check if SPN is registered correctly:
 setspn -L $gmsaSQL 
 
+<#
+if there's an error "The target principal name is incorrect.  Cannot generate SSPI context."
+remove then add back the GMSA account from SQL Services, set it to a default account
+#>
