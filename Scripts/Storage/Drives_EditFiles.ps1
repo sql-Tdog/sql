@@ -1,8 +1,6 @@
-New-Item "C:\SQLBackups" -ItemType Directory
-New-SmbShare -Path C:\SQLBackups -Name "SQLBackups$"
+#create a new folder:
+New-Item "C:\Temp" -ItemType Directory
+
+#create a new SMB Share:
+New-SmbShare -Path C:\Temp -Name "SharedFolder$"
  
-New-Item "C:\SQLBackupsKeep" -ItemType Directory
-New-SmbShare -Path C:\SQLBackupsKeep -Name "SQLBackupsKeep$"
- 
-New-Item "C:\SQLBackupsScratch" -ItemType Directory
-New-SmbShare -Path C:\SQLBackupsScratch -Name "SQLBackupsScratch$"
