@@ -1,5 +1,11 @@
-<#Can we extend individual disks in a pool?
-Test it out....
+<#do not remove server from the cluster and do not pause cluster node, the new drives will appear on
+the Clustered Windows Storage because the VM is part of a cluster that is fine...
+To differentiate between drives, just add the new drives on one node at a time 
+and create the storage space, then add the drives on the second node.
+If that's not possible, then shut down the other nodes to make sure their disks are not visible.
+
+To maximize the storage pool size, add disks that are of equal size, 
+the number of disks has to be a minimum of NumberOfColumns on the Pool:
 #>
 Get-VirtualDisk | Select-Object FriendlyName, NumberOfColumns
 
