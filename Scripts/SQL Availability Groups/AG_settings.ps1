@@ -1,0 +1,1 @@
+SELECT databasepropertyex('YourDBName','updateability')

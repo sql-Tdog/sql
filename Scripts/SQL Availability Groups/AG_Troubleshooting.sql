@@ -9,7 +9,7 @@ ALTER AVAILABILITY GROUP [AGName] REMOVE REPLICA on 'ServerName';
 
 
 --add database back:
-ALTER  DATABASE database SET HADR AVAILABILITY GROUP = AGDSNA2P01
+ALTER  DATABASE database SET HADR AVAILABILITY GROUP = AGName
 ALTER  DATABASE database SET HADR RESUME
 
 
@@ -255,20 +255,17 @@ Fix Option 2:  Add a new log file to the database on a different drive.
 Fix Option 3:  Move database transaction log to bigger drive.  To do this, remove secondary database from the group and add it back once all files are in the right new locations.
 Esure that the log backups are disabled on all replicas so that the log file remains intact (not truncated), otherwise will need to perform a full backup and log backup
 and apply that to the secondary to re-initialize replica.
-	EXEC [p-biodswin02].msdb.dbo.sp_update_job  
+	EXEC msdb.dbo.sp_update_job  
 		@job_name = N'Backup_Datamart_Log',  
 		@enabled = 0 ;  
-	GO 
-	EXEC [servername].msdb.dbo.sp_update_job  
-		@job_name = N'Backup_Datamart_Log',  
-		@enabled = 0 ;  
+ 
 	GO 
 	--From primary, remove secondary replica from group:
 	ALTER DATABASE Test_Cluster SET HADR OFF;
-	ALTER AVAILABILITY GROUP [AG_Test] REMOVE REPLICA on 'p-biodswin02';
+	ALTER AVAILABILITY GROUP [AG_Test] REMOVE REPLICA on 'ServerName';
 	--move files to the desired location
-	ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'P-BIODSWIN02' WITH 
-		(ENDPOINT_URL = 'TCP://P-BIODSWIN02.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
+	ALTER AVAILABILITY GROUP [AG_Test] ADD REPLICA ON 'ServerName' WITH 
+		(ENDPOINT_URL = 'TCP://ServerName.domain.com:5022', FAILOVER_MODE = MANUAL, AVAILABILITY_MODE = ASYNCHRONOUS_COMMIT, BACKUP_PRIORITY = 50, 
 		SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 	--from secondary:
 	ALTER AVAILABILITY GROUP [AG_Test] JOIN;
@@ -284,14 +281,14 @@ Details:  Error log shows 0% recovery completed repeatedly
 		  Stopping SQL services is not working
 		  Can't delete database because there is a snapshot which won't delete either, a background SQL process is running recovery on the HA database.
 Fix:  issue the stmt to resume HADR then wait a few minutes for the database to recover (will see % of recovery process in the error log)
-ALTER DATABASE [know-CenterProfiles] SET HADR RESUME;
+ALTER DATABASE [DbName] SET HADR RESUME;
 
 
 Error:  Always On Availability Groups data movement for database 'SSISDB' has been suspended for the following reason: "system" (Source ID 2; Source string: 
 'SUSPEND_FROM_REDO'). To resume data movement on the database, you will need to resume the database 
 manually. 
 Fix:  issue the stmt to resume HADR, should resume immediately...there will be a message in the error log that some # of transactions rolled forward in the database
-ALTER DATABASE [know-CenterProfiles] SET HADR RESUME;
+ALTER DATABASE [DbName] SET HADR RESUME;
 
 
 */

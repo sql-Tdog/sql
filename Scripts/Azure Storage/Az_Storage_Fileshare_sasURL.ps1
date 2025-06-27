@@ -10,12 +10,10 @@ $subscription = "xxx"
 #connect to Azure with the user-managed-assigned Managed Identity
 #new method:
 Az login --identity --allow-no-subscriptions
-$AzureContext = Set-AzContext -SubscriptionName $subscription  
-$AzureContext
+Set-AzContext -SubscriptionName $subscription
 
 #old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
-
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
 

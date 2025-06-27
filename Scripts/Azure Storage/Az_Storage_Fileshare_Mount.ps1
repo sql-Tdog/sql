@@ -18,11 +18,6 @@ $inst1=""
 $inst2=""
 
 #connect to Azure with the user-managed-assigned Managed Identity
-#new method: (automatically discovers the identity assigned to the VM and uses it to connect to Azure)
-Az login --identity --allow-no-subscriptions
-
-
-#old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $UMIClientId).context 
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
