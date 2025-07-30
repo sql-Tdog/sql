@@ -1,4 +1,5 @@
 --this command will stop then restart the endpoint:
+ALTER ENDPOINT Hadr_endpoint STATE=STOPPED
 ALTER ENDPOINT Hadr_endpoint STATE=STARTED
 
 --to stop database from syncing: (this alone will not clear log on primary)
