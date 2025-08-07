@@ -6,13 +6,13 @@ $primary_nic1=""
 $primary_nic2=""
 $clust1=""
 
-Install-WindowsFeature –Name Failover-Clustering –IncludeManagementTools -ComputerName $inst1
-Install-WindowsFeature –Name Failover-Clustering –IncludeManagementTools -ComputerName $inst2
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst1
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst2
 
 #Check the nodes are good to cluster
 Test-Cluster -Node $inst1, $inst2 -Ignore Storage
 #create cluster
-New-Cluster -Name $clust1 –Node $inst1, $inst2 –StaticAddress $primary_nic1, $primary_nic2 -NoStorage
+New-Cluster -Name $clust1 -Node $inst1, $inst2 -StaticAddress $primary_nic1, $primary_nic2 -NoStorage
 
 
 

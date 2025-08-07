@@ -1,7 +1,3 @@
-<#do not remove server from the cluster and do not pause cluster node, the new drives will appear on the Clustered Windows Storage 
-because the VM is part of a cluster that is fine...to differentiate between drives, just add the new drives on one node at a time 
-and create the storage space, then add the drives on the second node
-#>
 Get-ClusterResource
 Get-StorageJob
 
@@ -56,7 +52,7 @@ $CreatePool = New-StoragePool @PoolParams | New-VirtualDisk @VirtualDiskParams |
 
 Set-Location $DriveLetter`:\
 mkdir $DriveLetter`:\MSSQL\Data
-mkdir $DriveLetter`:\MSSQL\Log
+mkdir $DriveLetter`:\MSSQL\Log
 
 
 #clean up in case something goes wrong:
