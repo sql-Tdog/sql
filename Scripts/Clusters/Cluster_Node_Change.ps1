@@ -9,8 +9,9 @@ $clust1=""
 Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst1
 Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -ComputerName $inst2
 
-#Check the nodes are good to cluster
+#Check the nodes are good to cluster, always run this 
 Test-Cluster -Node $inst1, $inst2 -Ignore Storage
+
 #create cluster
 New-Cluster -Name $clust1 -Node $inst1, $inst2 -StaticAddress $primary_nic1, $primary_nic2 -NoStorage
 
@@ -18,8 +19,11 @@ New-Cluster -Name $clust1 -Node $inst1, $inst2 -StaticAddress $primary_nic1, $pr
 
 #swap nodes:
 Remove-ClusterNode -Cluster $clust1 -Name $inst2 -Force
-Add-ClusterNode -Cluster $clust1 -Name $inst1 
 
+#before adding a new node, run the test with all nodes included: new and existing:
+Test-Cluster -Node $inst1, $inst2 -Ignore Storage
+#if test is good, add the new node:
+Add-ClusterNode -Cluster $clust1 -Name $inst1 -StaticAddress "192.168.1.10" 
 
 
 #view cluster objects:

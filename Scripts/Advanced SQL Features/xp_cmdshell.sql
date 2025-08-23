@@ -30,6 +30,9 @@ GO
 --view files on Z drive:
 EXEC xp_dirtree 'Z:\', 1,1
 
+--copy files from the Z drive to another drive:
+EXECUTE xp_cmdshell 'copy Z:\Backups\DB\db_backup.bak D:\Temp\'
+
 
 
 USE [master]

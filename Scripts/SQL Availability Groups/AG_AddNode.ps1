@@ -54,6 +54,19 @@ SEEDING_MODE=MANUAL, SECONDARY_ROLE(ALLOW_CONNECTIONS = ALL));
 "
 Invoke-Sqlcmd -ServerInstance $AGListener -Query $tsql 
 
+#Open AG listener settings in SSMS and Add the new IP Address
+#Otherwise, this error would be thrown:   None of the IP addresses configured for the availability 
+#group listener can be hosted by the server 'xxx'. Either configure a public cluster network on which 
+#one of the specified IP addresses can be hosted, or add another listener IP address which can be hosted 
+#on a public cluster network for this server.  Failed to join local availability replica to availability 
+#group 'xxx'.  The operation encountered SQL Server error 19456 and has been rolled back
+
+
+# Now, join the secondary replica to the availability group.  
+$tsql="ALTER AVAILABILITY GROUP $AGname JOIN; "
+Invoke-Sqlcmd -ServerInstance $newNode -Query $tsql 
+
+
 
 #set permissions for the AG:
 $Query="ALTER AUTHORIZATION ON AVAILABILITY GROUP::$AGname TO [$AD\$gmsaSQL1];
@@ -63,8 +76,5 @@ ALTER AVAILABILITY GROUP $AGname GRANT CREATE ANY DATABASE;
 Invoke-Sqlcmd -ServerInstance $newNode -Query $Query 
 
 
-# Join the secondary replica to the availability group.  
-$tsql="ALTER AVAILABILITY GROUP $AGname JOIN; "
-Invoke-Sqlcmd -ServerInstance $newNode -Query $tsql 
 
 #set read-only routing next
