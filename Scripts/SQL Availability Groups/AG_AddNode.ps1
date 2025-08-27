@@ -78,3 +78,7 @@ Invoke-Sqlcmd -ServerInstance $newNode -Query $Query
 
 
 #set read-only routing next
+nslookup $AGListener
+
+#AGListener should return all IP addresses of the nodes in the group, it will update after a failover
+#fail over to the new node and verify that you can connect to the listener
