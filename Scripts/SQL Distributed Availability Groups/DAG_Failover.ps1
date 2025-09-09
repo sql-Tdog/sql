@@ -19,9 +19,13 @@ To do an emergency failover, allowing data loss:
 $Query="ALTER AVAILABILITY GROUP $DAGname FORCE_FAILOVER_ALLOW_DATA_LOSS;"
 Invoke-Sqlcmd -ServerInstance $List1 -Query $Query 
 
+#verify all replicas are on the same SQL version and on the same CU level
+
+#use SSMS check for any long running transactions on both listeners
+#and pre-failover counters on the secondary AG listener
 
 #To ensure no data is lost, follow the script below
-#verify all replicas in the AG are in sync commit mode:
+#verify all auto-failover replicas in the AG are in sync commit mode:
 $query="
 SELECT DISTINCT replica_server_name, synchronization_state_desc, failover_mode_desc
 FROM sys.dm_hadr_database_replica_states dr inner join sys.availability_replicas ar on ar.replica_id=dr.replica_id

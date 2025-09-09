@@ -26,3 +26,6 @@ Get-AzStorageFile -Context $ctx -ShareName $fileShare -Path $path | Get-AzStorag
 #view file sizes 
 Get-AzStorageFile -Context $ctx -ShareName $fileShare -Path $path | Get-AzStorageFile | Select-Object Name, Length
 
+#upload a file to the share:
+$fileToUpload="C:\Temp\test.bak"
+Set-AzStorageFileContent  -File $fileToUpload -ShareName $fileShare -Context $ctx -Force
