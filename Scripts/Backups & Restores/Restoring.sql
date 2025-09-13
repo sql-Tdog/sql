@@ -71,11 +71,10 @@ DROP DATABASE Staging;
 --*************attach database data file and log**************************************************
 USE [master]
 CREATE DATABASE sttts ON ( FILENAME = N'C:\SQLData\sttts.mdf'),
-( FILENAME = N'C:\SQLData\sttts.LDF')  FOR ATTACH 
+( FILENAME = N'C:\SQLData\sttts.LDF') FOR ATTACH 
 
 --**attach database data file without a transaction log***
 --**SQL Server will create a new transaction log*******************
- 
 USE [master]
 CREATE DATABASE Everest ON
 ( FILENAME = N'C:\Everest_backup_2014_10_16.mdf')

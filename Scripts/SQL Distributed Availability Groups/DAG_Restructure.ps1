@@ -86,6 +86,7 @@ $Query="DROP AVAILABILITY GROUP [$DAGname1]"
 Invoke-Sqlcmd -ServerInstance $List1 -Query $Query 
 Invoke-Sqlcmd -ServerInstance $List2 -Query $Query 
 
+#databases will be removed from the AG
 
 #create the new DAG
 $Query="CREATE AVAILABILITY GROUP [$DAGName1]  
