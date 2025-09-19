@@ -29,6 +29,21 @@ rebalanced across all disks with the background pool optimize process.
 immediate new capacity while the rebalance process runs in the background.
 -Rebalancing of data between disks in the pool is a lightweight, background process which can take a very long time.  It runs at a low priority. But make sure there is enough 
 available throughput on the system to allow the rebalance.
+Get-StoragePool -FriendlyName $pool | Optimize-StoragePool
+-As part of the process, the disk will be regenerated.  Once the process is done, extend the virtual disk and expand the partition of the disk presented to the OS.
 -Set IOPs per gigabyte to be the same across all disks.
+-If we want to increate the storage pool quickly without optimizing storage, then add the same number of disks as 
+the number of columns on the virtual disk in the pool:  
+Get-VirtualDisk | Select FriendlyName, NumberOfColumns
+This is called keeping the column size in the pool the same.  It will allow you to add the drives and increase 
+the virtual disk pretty much instantaneously.
+
+
+1.  Add the new LUNs to the VM. 
+2.  Add the disks to the pool (I added 2 new disks of 1.5 TB each to a pool of 6 disks 1.5TB each)
+3.  I could not extend the virtual disk but after the optimize-storagepool command, I could extend the virtual disk
+4.  Extend the size of the pool with: 
+$Partition = $vdisk | Get-Disk | Get-Partition | Where PartitionNumber -Eq 2
+$Partition | Resize-Partition -Size ($Partition | Get-PartitionSupportedSize).SizeMax
 
 #>

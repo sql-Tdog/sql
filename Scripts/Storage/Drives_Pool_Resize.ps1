@@ -25,20 +25,27 @@ Get-StorageSubSystem | Where AutomaticClusteringEnabled -eq $true | Set-StorageS
 $PhysicalDisksForPool = Get-PhysicalDisk -CanPool $True | Where-Object {$_.PhysicalLocation -match "LUN 12" -or $_.PhysicalLocation -match "LUN 11" -or $_.PhysicalLocation -match"LUN 14"}
 $PhysicalDisksForPool
 
-#add disks to the pool:
+# add disks to the pool:
 Add-PhysicalDisk -StoragePoolFriendlyName $pool -PhysicalDisks $PhysicalDisksForPool
+
+#view the column size of the virtual disk of the pool:
+Get-VirtualDisk
+$vdisk = Get-VirtualDisk -FriendlyName "xxx"
+$vdisk | Select FriendlyName, NumberOfColumns
+
+#rebalance data across all disks in the pool so that we can expand the virtual disk
+#this is needed if the number of disks added does not match the number of columns
+#this is a lightweight background process that may take a very long time depending on size of disk
+Get-StoragePool -FriendlyName $pool | Optimize-StoragePool
+Optimize-Volume -DriveLetter F: -ReTrim -SlabConsolidate -Verbose
+
 
 #increase the size of the virtual disk:
 $addBytes = get-virtualDiskSupportedSize -storagePoolFriendlyName $pool | Select-Object -Property VirtualDiskSizeMax
 $Virtualdiskresize = $addBytes.VirtualDiskSizeMax  + $vdisk.Size
 Resize-VirtualDisk -FriendlyName $vdisk.FriendlyName -Size ($Virtualdiskresize)
 
-#increase the size of the pool:
-$Partition = $vdisk | Get-Disk | Get-Partition | Where PartitionNumber -Eq 2
+#increase the size of the disk presented to the OS:
+$Partition = $vdisk | Get-Disk | Get-Partition | Where-Object PartitionNumber -Eq 2
 $Partition | Resize-Partition -Size ($Partition | Get-PartitionSupportedSize).SizeMax
 
-
-#to rebalance data across all disks in the pool:  (may take a very long time)
-Get-StoragePool -FriendlyName $pool | Optimize-StoragePool
-
-Optimize-Volume -DriveLetter F: -ReTrim -SlabConsolidate -Verbose

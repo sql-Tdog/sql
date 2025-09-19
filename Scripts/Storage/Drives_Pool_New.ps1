@@ -28,7 +28,7 @@ $PoolParams = @{
                 "ProvisioningTypeDefault"      = "Fixed"
             }
 $VirtualDiskParams = @{
-                "FriendlyName"          = "SQL Data Disk ($($DriveLetter))"
+                "FriendlyName"          = "$VM SQL Data Disk ($($DriveLetter))"
                 "Interleave"            = 65536
                 "NumberOfColumns"       = $DiskCountForNumberOfColumns
                 "ResiliencySettingName" = "Simple"

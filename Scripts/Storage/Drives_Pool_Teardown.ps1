@@ -17,6 +17,7 @@ Get-StorageSubSystem | Where AutomaticClusteringEnabled -eq $true | Set-StorageS
 Get-StoragePool | Where-Object {$_.FriendlyName -ne "Primordial"}
 
 #remove old pool:
+#note that this command will remove all virtual disks with the same name in the cluster, very scary!
 $Vdisk=Get-VirtualDisk
 Remove-VirtualDisk -FriendlyName  $Vdisk.FriendlyName
 $pool=Get-StoragePool | Where-Object {$_.FriendlyName -ne "Primordial"}
