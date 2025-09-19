@@ -31,11 +31,12 @@ Add-PhysicalDisk -StoragePoolFriendlyName $pool -PhysicalDisks $PhysicalDisksFor
 #view the column size of the virtual disk of the pool:
 Get-VirtualDisk
 $vdisk = Get-VirtualDisk -FriendlyName "xxx"
-$vdisk | Select FriendlyName, NumberOfColumns
+$vdisk | Select-Object FriendlyName, NumberOfColumns
 
 #rebalance data across all disks in the pool so that we can expand the virtual disk
 #this is needed if the number of disks added does not match the number of columns
-#this is a lightweight background process that may take a very long time depending on size of disk
+#if ran with -AsJob parameter: it is a lightweight background process 
+#may take a very long time depending on size of disk
 Get-StoragePool -FriendlyName $pool | Optimize-StoragePool
 Optimize-Volume -DriveLetter F: -ReTrim -SlabConsolidate -Verbose
 
