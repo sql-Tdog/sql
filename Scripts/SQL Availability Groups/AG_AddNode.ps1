@@ -82,3 +82,17 @@ nslookup $AGListener
 
 #AGListener should return all IP addresses of the nodes in the group, it will update after a failover
 #fail over to the new node and verify that you can connect to the listener
+
+
+#Stop then start the cluster resource to persist the newly added listener IP to the AGL listener.
+#After the AG is setup set the clustered params and restart the resources
+$clust1 = ""
+$listener1 = ""
+$AGname1 = ""
+$AGName_Listener1="$AGname1`_$listener1"
+get-ClusterResource -Cluster $clust1 -Name $AGName_Listener1 | Get-ClusterParameter  
+get-ClusterResource -Cluster $clust1 -Name $AGName_Listener1 | set-ClusterParameter RegisterAllProvidersIP 1
+get-ClusterResource -Cluster $clust1 -Name $AGName_Listener1 | set-ClusterParameter HostRecordTTL 300
+stop-clusterresource -Cluster $clust1 -Name $AGName_Listener1
+start-clusterresource -Cluster $clust1 -Name $AGName_Listener1
+Start-ClusterResource  -Cluster $clust1 -Name $AGname1

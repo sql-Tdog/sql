@@ -111,3 +111,4 @@ Start-ClusterResource  -Cluster $clust1 -Name $AGname1
 
 #Possible listener error:
 # The specified IP Address 'xxx' is not valid in the cluster-allowed IP range.
+# Possible reason:  new IP is in the same subnet as an existing IP, they need to be in different subnets
