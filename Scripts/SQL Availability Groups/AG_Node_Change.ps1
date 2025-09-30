@@ -96,3 +96,9 @@ get-ClusterResource -Cluster $clust1 -Name $AGName_Listener1 | set-ClusterParame
 stop-clusterresource -Cluster $clust1 -Name $AGName_Listener1
 start-clusterresource -Cluster $clust1 -Name $AGName_Listener1
 Start-ClusterResource  -Cluster $clust1 -Name $AGname1
+
+
+#After removing a node from the AG permanently, remove its IP Address from the listener role
+#Go to Failover Cluster Manager>Roles>Resources tab>look at IP addresses of the listener
+#Remove the one that is no longer in service
+#View the properties of the listener in SSMS, the removed IPs should be gone

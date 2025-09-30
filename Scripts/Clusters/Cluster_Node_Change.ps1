@@ -15,8 +15,6 @@ Test-Cluster -Node $inst1, $inst2 -Ignore Storage
 #create cluster
 New-Cluster -Name $clust1 -Node $inst1, $inst2 -StaticAddress $primary_nic1, $primary_nic2 -NoStorage
 
-
-
 #swap nodes:
 Remove-ClusterNode -Cluster $clust1 -Name $inst2 -Force
 

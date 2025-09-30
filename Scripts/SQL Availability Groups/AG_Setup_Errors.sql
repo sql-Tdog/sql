@@ -17,8 +17,9 @@ remove the replica and add it back with the correct endpoint URL.
 
 Test-NetConnection ListenerName
 The client attempts to connect to all IP addresses for the listener, until it succeeds.
-Resolve by setting the RegisterAllProvidersIP cluster parameter to 1 for the listener
-RegisterAllProvidersIP controls whether all IP addresses are registered in DNS. By setting it to 0, only the active IP address is registered.
+Resolve by setting the RegisterAllProvidersIP cluster parameter to 0 for the listener
+RegisterAllProvidersIP controls whether all IP addresses are registered in DNS. 
+By setting it to 0, only the active IP address is registered.
 $clust1 = ""
 $listener1 = ""
 $AGname1 = ""
