@@ -62,6 +62,8 @@ $Blob1HT = @{
 }
 Set-AzStorageBlobContent @Blob1HT -Debug
 
+#upload all files from a folder:
+Get-ChildItem -File -Recurse | Set-AzStorageBlobContent -Container "ContosoUploads"
 
 
 #delete a file from the container:

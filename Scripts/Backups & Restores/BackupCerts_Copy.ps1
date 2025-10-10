@@ -1,11 +1,11 @@
-$sourceVM="AGLNA4BMD01" 
+$sourceVM = "" 
 #target VMs:
-$inst1="cusqlbmna4s1p01"
-$inst2="cusqlbmna4s2p01"
-$inst3="e2sqlbmna4s1p01"
-$inst4="e2sqlbmna4s2p01"
-$CertPath="\\cusqlbmna4s1p01\Temp\BackupCert.cert"
-$KeyPath="\\cusqlbmna4s1p01\Temp\BackupCert.key"
+$inst1 = ""
+$inst2 = ""
+$inst3 = ""
+$inst4 = ""
+$CertPath = "\\xxx\Temp\BackupCert.cert"
+$KeyPath = "\\xxx\Temp\BackupCert.key"
 $Pass="xxx"
 $DMKPass="xxx"
 
@@ -36,7 +36,7 @@ Invoke-Sqlcmd -ServerInstance $inst3 -Query $Query
 Invoke-Sqlcmd -ServerInstance $inst4 -Query $Query 
 
 #create backup certificate
-$Query="CREATE CERTIFICATE BackupCert FROM FILE = 'C:\Temp\BackupCert.cert' WITH PRIVATE KEY (file='C:\Temp\BackupCert.key', DECRYPTION BY PASSWORD='$Pass');"
+$Query="CREATE CERTIFICATE BackupCert FROM FILE = '$CertPath' WITH PRIVATE KEY (file='$KeyPath', DECRYPTION BY PASSWORD='$Pass');"
 Invoke-Sqlcmd -ServerInstance $inst1 -Query $Query 
 Invoke-Sqlcmd -ServerInstance $inst2 -Query $Query 
 Invoke-Sqlcmd -ServerInstance $inst3 -Query $Query 
