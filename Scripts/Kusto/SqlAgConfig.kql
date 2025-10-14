@@ -1,0 +1,4 @@
+SqlAvailabilityGroupConfig
+| where Timestamp > ago(14d) 
+| summarize arg_max(Timestamp,*) by AGName
+| sort by Timestamp asc

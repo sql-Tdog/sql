@@ -69,10 +69,12 @@ Invoke-Sqlcmd -ServerInstance $inst2 -Query $Query
 
 #define replicas
 #use primary nic for database mirroring endpoints to separate application users traffic from database mirroring
-$endpoint1="TCP://$inst1.$fqdn`:5022"
-$endpoint2="TCP://$inst2.$fqdn`:5022"
-$primaryReplica = New-SqlAvailabilityReplica -Name $inst1 -EndpointURL $endpoint1 -AvailabilityMode "SynchronousCommit"  -FailoverMode  "Automatic"  -Version 16 -AsTemplate 
-$secondaryReplica = New-SqlAvailabilityReplica -Name $inst2 -EndpointURL $endpoint2 -AvailabilityMode "SynchronousCommit"  -FailoverMode "Automatic" -Version 16 -AsTemplate  
+$endpoint1 = "TCP://$inst1.$fqdn`:5022"
+$endpoint2 = "TCP://$inst2.$fqdn`:5022"
+$readrouting1 = "TCP://$inst1.$fqdn`:1433"
+$readrouting2 = "TCP://$inst1.$fqdn`:1433"
+$primaryReplica = New-SqlAvailabilityReplica -Name $inst1 -EndpointURL $endpoint1 -ReadonlyRoutingConnectionUrl $readrouting1 -AvailabilityMode "SynchronousCommit"  -FailoverMode  "Automatic"  -Version 16 -AsTemplate 
+$secondaryReplica = New-SqlAvailabilityReplica -Name $inst2 -EndpointURL $endpoint2 -ReadonlyRoutingConnectionUrl $readrouting2 AvailabilityMode "SynchronousCommit"  -FailoverMode "Automatic" -Version 16 -AsTemplate  
 
 $primaryServer = get-item "SQLSERVER:\SQL\$inst1\DEFAULT" 
 
