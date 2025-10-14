@@ -54,6 +54,8 @@ $Blob1HT = @{
 }
 Set-AzStorageBlobContent @Blob1HT 
 
+#upload files to restore:
+Get-ChildItem -Path 'C:\Temp\TestUpload' -File -Recurse | Set-AzStorageBlobContent -Container $containerName -Context $AzStorageContext
 
 #restore filelistonly:
 $storageUri=$cbc.Uri.AbsoluteUri
@@ -65,6 +67,19 @@ $tsql
 $SAURL = $storageAccountName + ".blob.core.windows.net"
 Test-NetConnection  $SAURL -port 443
 
+#upload TDE certs:
+#find the location of pvk2pfx and then cd to its folder:
+cd "C:\Program Files\Azure Data Studio\resources\app\extensions\mssql\sqltoolsservice\Windows\4.7.1.4\"
+.\pvk2pfx -pvk C:\Temp\TDE\TDECERT.crtpvtkey -pi "password" -spc C:\Temp\TDE\TDECERT.crt -pfx C:/Temp/TDE_Cert.pfx
+
+$fileContentBytes = Get-Content 'C:\Temp\TDE\TDE_Cert.pfx' -AsByteStream
+$base64EncodedCert = [System.Convert]::ToBase64String($fileContentBytes)
+$securePrivateBlob = $base64EncodedCert  | ConvertTo-SecureString -AsPlainText -Force
+$password = "<password>"
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$MIresourceGroupName = ""
+$MIname = ""
+Add-AzSqlManagedInstanceTransparentDataEncryptionCertificate -ResourceGroupName $MIresourceGroupName -ManagedInstanceName $MIname -PrivateBlob $securePrivateBlob -Password $securePassword
 
 
 #to turn off TDE so that a copy_only backup can be taken:

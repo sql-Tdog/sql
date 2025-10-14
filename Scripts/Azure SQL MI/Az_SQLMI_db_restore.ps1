@@ -1,7 +1,6 @@
 Install-Module -Name Az.Sql  
 Install-Module -Name Az.Accounts  
-#this newer module does not work with opening the browser to log in
-Uninstall-Module -Name Az.Accounts -RequiredVersion 3.0.0
+
 Import-Module -Name Az.Accounts -RequiredVersion 2.19.0
 
 
