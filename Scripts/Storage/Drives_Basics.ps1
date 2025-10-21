@@ -1,7 +1,6 @@
 #get drive info
 Get-WmiObject -Class Win32_volume -Filter "Filesystem='NTFS'" -ComputerName 'FRASDB005' | Select-Object Name, Label, BlockSize, FreeSpace, Capacity | Format-Table -Autosize 
 
-
 #reset drives to uninitialized status:
 clear-disk -number 6 -RemoveData -Confirm:$False
 clear-disk -number 3 -RemoveData -Confirm:$False
@@ -32,7 +31,7 @@ Get-Disk -Number 4 | New-Volume -FileSystem NTFS -DriveLetter T -FriendlyName 'T
 Get-Disk -Number 5 | New-Volume -FileSystem NTFS -DriveLetter L -FriendlyName 'Log' -AllocationUnitSize 65536
 
 ##Get Uninitialized Disks and Format them
-Get-Disk | where partitionstyle -eq ‘raw’ 
+Get-Disk | where partitionstyle -eq "raw" 
 #this will return disk number, use it to format disk and assign letter:
 Get-Disk -Number 5 | New-Volume -FileSystem NTFS -DriveLetter H -FriendlyName 'SQL Data (H)' -AllocationUnitSize 65536
 
@@ -69,3 +68,7 @@ New-StoragePool -FriendlyName "SQLDATAPOOL" -StorageSubsystemFriendlyName "Windo
     ClusterNetwork =Get-ClusterNetwork
     CluterNode=Get-ClusterNode
     }|Export-Clixml-Path$HOME\cluster_diag_$env:computername.xml
+
+
+#view bytes per cluster:
+fsutil fsinfo ntfsinfo F:/

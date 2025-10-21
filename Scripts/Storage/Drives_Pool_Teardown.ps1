@@ -18,9 +18,9 @@ Get-StoragePool | Where-Object {$_.FriendlyName -ne "Primordial"}
 
 #remove old pool:
 #note that this command will remove all virtual disks with the same name in the cluster, very scary!
-$Vdisk=Get-VirtualDisk
+$Vdisk = Get-VirtualDisk
 Remove-VirtualDisk -FriendlyName  $Vdisk.FriendlyName
-$pool=Get-StoragePool | Where-Object {$_.FriendlyName -ne "Primordial"}
+$pool = Get-StoragePool | Where-Object {$_.FriendlyName -ne "Primordial"}
 Remove-StoragePool -FriendlyName $pool.FriendlyName
 
 #if disks are cleared, partitionstyle will be Raw, clear them:

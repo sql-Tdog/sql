@@ -43,6 +43,8 @@ $fileToUpload="C:\Temp\test.bak"
 
 $storageContext = New-AzStorageContext -StorageAccountName $storageAccountName -SasToken $sasToken
 
+#create a new container:
+$Azcontainer = New-AzStorageContainer -Name "backups" -Context $AzStorageContext
 
 #list blobls in a container:
 Get-AzStorageBlob -Container $containerName -Context $storageContext 
