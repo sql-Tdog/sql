@@ -46,16 +46,22 @@ Add-AzSqlManagedInstanceTransparentDataEncryptionCertificate -ResourceGroupName 
 
 #now, get access to the storage account to create SQL token & upload files:
 #storage container kind should be StorageV2 (general purpose) and container type: blob
-$storageAccountRG = "xxxx"
-$storageAccountName = "xxxx"
-$containerName = "backups"
-$containerSubscription = "xxx"
 $managedIdClientId ="xxx" #use the MI assigned to the VM and container for access
+$containerSubscription = "xxx"
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId -Subscription $containerSubscription).context 
 $AzureContext
 
+
+$storageAccountRG = "xxxx"
+$storageAccountName = "xxxx"
 $StAccountKey = Get-AzStorageAccountKey -ResourceGroupName $storageAccountRG -Name $storageAccountName 
 $AzStorageContext = New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $StAccountKey[0].value 
+
+
+$containerName = "backups"
+#if container doesn't exist, create it:
+$Azcontainer = New-AzStorageContainer -Name "backups" -Context $AzureContext
+#else, just grab it:
 $Azcontainer = Get-AzStorageContainer -Name $containerName -Context $AzStorageContext
 $cbc = $Azcontainer.CloudBlobContainer
 $policyName = 'DBBackup'

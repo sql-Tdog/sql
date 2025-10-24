@@ -7,3 +7,6 @@ So, Whenever we have such upgrade script failure issue and SQL is not getting st
 net start MSSQLSERVER /T902
 
 sqlcmd.exe -E -S
+
+#to connect to the listener that spans multiple subnets, use -M parameter:
+sqlcmd -S listener -M
