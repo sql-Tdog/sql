@@ -56,7 +56,7 @@ WHERE database_id = DB_ID(N'DW_Base');
 
  --3.  using cmd shell, net stop MSSQLSERVER
  --4.  move database file physically to new location (tempdb files are recreated each time
-		SQL Server is restarted so no need to move them)
+	SQL Server is restarted so no need to move them)
  --5.  net start MSSQLSERVER
 
  --6.  for msdb database, verify that the Service Broker is enabled, if server is configured for database mail

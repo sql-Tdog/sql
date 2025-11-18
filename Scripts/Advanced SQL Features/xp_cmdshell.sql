@@ -57,4 +57,21 @@ execute(@stmt);
 
 EXEC xp_fixeddrives
 
+
+--delete a file:
+EXECUTE master.dbo.xp_delete_file 0,N'U:\Temp\FullBackupFromAG_DeleteMe.bak'
+
+
+EXEC xp_cmdshell 'dir /B "U:\backup\"';
+
+
+
+CREATE TABLE #files (excelFileName VARCHAR(100));
+
+INSERT INTO #files
+EXEC xp_cmdshell 'dir /B "\\pdx1cmsdb1p\CMSFULL\"';
+
+EXEC xp_cmdshell 'copy \\pdx1cmsdb1p\CMSFULL\ U:\backup';
+
+
 **/

@@ -2,10 +2,11 @@ EXEC sp_spaceused;
 
 --check white space in each file of database:
 SELECT DB_NAME() AS DbName, 
-name AS FileName, 
-size/128.0 AS CurrentSizeMB, 
-size/128.0 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS INT)/128.0 AS FreeSpaceMB 
+name AS FileName,
+size/128.0/1024. AS CurrentSizeGB, 
+size/128.0/1024 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS INT)/128.0/1024 AS FreeSpaceGB 
 FROM sys.database_files; 
+
 
 
 /**
@@ -47,11 +48,11 @@ FROM
 */
 /**select the last object that was updated or scanned last: */
 
-    SELECT TOP 10 o.name, o.type_desc, last_user_seek, last_user_scan, last_user_lookup, last_user_update
-    FROM sys.dm_db_index_usage_stats s
-	INNER JOIN sys.objects O ON O.object_id=s.object_id
-    WHERE database_id = DB_ID()
-	ORDER BY last_user_update DESC, COALESCE(last_user_seek, last_user_scan) DESC
+SELECT TOP 10 o.name, o.type_desc, last_user_seek, last_user_scan, last_user_lookup, last_user_update
+FROM sys.dm_db_index_usage_stats s
+INNER JOIN sys.objects O ON O.object_id=s.object_id
+WHERE database_id = DB_ID()
+ORDER BY last_user_update DESC, COALESCE(last_user_seek, last_user_scan) DESC
 
 /**script to check database objects and usage
 

@@ -25,7 +25,7 @@ Adding a new disk to an existing pool:
 -So depending on the column size and how many disks are added, new disks will be hotter 
 -If all existing disks are full, you have to add the same number of new disks as the column size.  Otherwise, you won't be able to expand the virtual disk until the data is 
 rebalanced across all disks with the background pool optimize process.
--Every new stripe will go across the same number of disks as the column size.  Aim to ad a new disk when there is about 20% of space left on the existing disks.  Then, you get
+-Every new stripe will go across the same number of disks as the column size.  Aim to add a new disk when there is about 20% of space left on the existing disks.  Then, you get
 immediate new capacity while the rebalance process runs in the background.
 -Rebalancing of data between disks in the pool is a lightweight, background process which can take a very long time.  It runs at a low priority. But make sure there is enough 
 available throughput on the system to allow the rebalance.
