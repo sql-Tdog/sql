@@ -1,6 +1,6 @@
 
 --*****************************set up blocking alert:******************************************************************************************************
---1.  configure blocked process threshold values
+--1. configure blocked process threshold values
 select @@version
 
 EXEC sp_configure 'show advanced options',1
@@ -10,7 +10,7 @@ GO
 EXEC sp_configure 'blocked process threshold (s)',20
 GO
 RECONFIGURE WITH OVERRIDE 
---2.  Replace tokens for all job responses to alert
+--2. Replace tokens for all job responses to alert
 USE [msdb]
 GO
 sysmail_help_profile_sp
@@ -20,7 +20,7 @@ EXEC msdb.dbo.sp_set_sqlagent_properties @email_save_in_sent_folder=1,
 	@databasemail_profile=N'DBMail'
 
 --	restart SQL server agent service
---3.  Create a table to store blocking information
+--3. Create a table to store blocking information
 USE [DBAToolbox]
 GO
 
@@ -34,14 +34,14 @@ CREATE TABLE [dbo].[BlockedEvents](
 GO
 
 
---4.  Create a new job, in the step add the following script:
+--4. Create a new job, in the step add the following script:
 USE [msdb]
 GO
 
 BEGIN TRANSACTION
 DECLARE @ReturnCode INT
 SELECT @ReturnCode = 0
-/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 2/4/2020 2:52:46 PM ******/
+/****** Object: JobCategory [[Uncategorized (Local)]]  Script Date: 2/4/2020 2:52:46 PM ******/
 IF NOT EXISTS (SELECT name FROM msdb.dbo.syscategories WHERE name=N'[Uncategorized (Local)]' AND category_class=1)
 BEGIN
 EXEC @ReturnCode = msdb.dbo.sp_add_category @class=N'JOB', @type=N'LOCAL', @name=N'[Uncategorized (Local)]'
@@ -50,7 +50,7 @@ IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 END
 
 DECLARE @jobId BINARY(16)
-EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Blocking', 
+EXEC @ReturnCode = msdb.dbo.sp_add_job @job_name=N'Blocking', 
 		@enabled=1, 
 		@notify_level_eventlog=0, 
 		@notify_level_email=0, 
@@ -61,7 +61,7 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Blocking',
 		@category_name=N'[Uncategorized (Local)]', 
 		@owner_login_name=N'sa', @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Alert DBA]    Script Date: 2/4/2020 2:52:46 PM ******/
+/****** Object: Step [Alert DBA]  Script Date: 2/4/2020 2:52:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Alert DBA', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
@@ -76,7 +76,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Alert DB
 DECLARE @blockingxml XML;
 DECLARE @mail_profile varchar(300)=(SELECT TOP 1 name FROM msdb.dbo.sysmail_profile);
 DECLARE @recipient_emails varchar(600)=''user@domain.com'';
-SELECT  @blockingxml = N''$(ESCAPE_SQUOTE(WMI(TextData)))'';
+SELECT @blockingxml = N''$(ESCAPE_SQUOTE(WMI(TextData)))'';
 
 CREATE TABLE #BlockingDetails
 	(
@@ -126,27 +126,27 @@ DECLARE @body VARCHAR(max)
 SELECT @body =
 (
 	SELECT td = 
-	currentdb + ''</td><td>''  +  Nature + ''</td><td>'' + convert(varchar(max),waittime/1000./60) + ''</td><td>'' + transactionname + ''</td><td>'' + 
-	lockMode + ''</td><td>'' + status + ''</td><td>'' + clientapp +  ''</td><td>'' + 
-	hostname + ''</td><td>'' + loginname + ''</td><td>'' +  inputbuf
+	currentdb + ''</td><td>'' + Nature + ''</td><td>'' + convert(varchar(max),waittime/1000./60) + ''</td><td>'' + transactionname + ''</td><td>'' + 
+	lockMode + ''</td><td>'' + status + ''</td><td>'' + clientapp + ''</td><td>'' + 
+	hostname + ''</td><td>'' + loginname + ''</td><td>'' + inputbuf
 	FROM #BlockingDetails
-	FOR XML PATH( ''tr'' )     
-)  
+	FOR XML PATH( ''tr'' )   
+) 
 
-SELECT @body = ''<table cellpadding="2" cellspacing="2" border="1">''    
-              + ''<tr><th>currentdb</th><th>Nature</th><th>waittime_min</th><th>transactionname</th></th></th><th>lockMode</th></th>
-              </th><th>status</th></th></th><th>clientapp</th></th></th><th>hostname</th></th>
-              </th><th>loginname</th><th>inputbuf</th></tr>''    
-              + replace( replace( @body, ''&lt;'', ''<'' ), ''&gt;'', ''>'' )     
-              + ''</table>''  +  ''<table cellpadding="2" cellspacing="2" border="1"><tr><th>XMLData</th></tr><tr><td>'' + replace( replace( convert(varchar(max),@blockingxml),  ''<'',''&lt;'' ),  ''>'',''&gt;'' )  
-              + ''</td></tr></table>''
+SELECT @body = ''<table cellpadding="2" cellspacing="2" border="1">''  
+       + ''<tr><th>currentdb</th><th>Nature</th><th>waittime_min</th><th>transactionname</th></th></th><th>lockMode</th></th>
+       </th><th>status</th></th></th><th>clientapp</th></th></th><th>hostname</th></th>
+       </th><th>loginname</th><th>inputbuf</th></tr>''  
+       + replace( replace( @body, ''&lt;'', ''<'' ), ''&gt;'', ''>'' )   
+       + ''</table>'' + ''<table cellpadding="2" cellspacing="2" border="1"><tr><th>XMLData</th></tr><tr><td>'' + replace( replace( convert(varchar(max),@blockingxml), ''<'',''&lt;'' ), ''>'',''&gt;'' ) 
+       + ''</td></tr></table>''
 
 DROP TABLE #BlockingDetails
 
 --Insert into a table for further reference
 INSERT INTO DBAWork.dbo.BlockedEvents
-                (AlertTime, BlockedReport)
-                VALUES (getdate(), N''$(ESCAPE_SQUOTE(WMI(TextData)))'')
+        (AlertTime, BlockedReport)
+        VALUES (getdate(), N''$(ESCAPE_SQUOTE(WMI(TextData)))'')
 
 
 --send alert only if blocking spid is not equal to blocked spid:
@@ -175,14 +175,14 @@ IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 COMMIT TRANSACTION
 GOTO EndSave
 QuitWithRollback:
-    IF (@@TRANCOUNT > 0) ROLLBACK TRANSACTION
+  IF (@@TRANCOUNT > 0) ROLLBACK TRANSACTION
 EndSave:
 
 GO
 
 
 
-  --5.  Creat an alert, select alert type as WMI event
+ --5. Creat an alert, select alert type as WMI event
 USE [msdb]
 GO
 DECLARE @jobid uniqueidentifier
@@ -201,14 +201,14 @@ EXEC msdb.dbo.sp_add_alert @name=N'Blocking',
 GO
 
 
-  
+ 
 
 
 
 /**
 --to include other options such as killing connections:
 
---3.  Create a table to store blocking information
+--3. Create a table to store blocking information
 USE [DBAToolbox]
 GO
 
@@ -221,7 +221,7 @@ CREATE TABLE [dbo].[BlockedEvents](
 )
 GO
 
---4.  Create a new job, in the step add the following script:
+--4. Create a new job, in the step add the following script:
 USE [msdb]
 GO
 
@@ -238,7 +238,7 @@ IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 END
 
 DECLARE @jobId BINARY(16)
-EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Blocking', 
+EXEC @ReturnCode = msdb.dbo.sp_add_job @job_name=N'Blocking', 
 		@enabled=1, 
 		@notify_level_eventlog=0, 
 		@notify_level_email=0, 
@@ -262,7 +262,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Alert DB
 		@os_run_priority=0, @subsystem=N'TSQL', 
 		@command=N'SET QUOTED_IDENTIFIER ON
 DECLARE @blockingxml XML
-SELECT  @blockingxml = N''$(ESCAPE_SQUOTE(WMI(TextData)))''
+SELECT @blockingxml = N''$(ESCAPE_SQUOTE(WMI(TextData)))''
 
 CREATE TABLE #BlockingDetails
 (
@@ -312,20 +312,20 @@ DECLARE @body VARCHAR(max)
 SELECT @body =
 (
 	SELECT td = 
-	currentdb + ''</td><td>''  +  Nature + ''</td><td>'' + waittime + ''</td><td>'' + transactionname + ''</td><td>'' + 
-	lockMode + ''</td><td>'' + status + ''</td><td>'' + clientapp +  ''</td><td>'' + 
-	hostname + ''</td><td>'' + loginname + ''</td><td>'' +  inputbuf
+	currentdb + ''</td><td>'' + Nature + ''</td><td>'' + waittime + ''</td><td>'' + transactionname + ''</td><td>'' + 
+	lockMode + ''</td><td>'' + status + ''</td><td>'' + clientapp + ''</td><td>'' + 
+	hostname + ''</td><td>'' + loginname + ''</td><td>'' + inputbuf
 	FROM #BlockingDetails
-	FOR XML PATH( ''tr'' )     
-)  
+	FOR XML PATH( ''tr'' )   
+) 
 
-SELECT @body = ''<table cellpadding="2" cellspacing="2" border="1">''    
-              + ''<tr><th>currentdb</th><th>Nature</th><th>waittime</th><th>transactionname</th></th></th><th>lockMode</th></th>
-              </th><th>status</th></th></th><th>clientapp</th></th></th><th>hostname</th></th>
-              </th><th>loginname</th><th>inputbuf</th></tr>''    
-              + replace( replace( @body, ''&lt;'', ''<'' ), ''&gt;'', ''>'' )     
-              + ''</table>''  +  ''<table cellpadding="2" cellspacing="2" border="1"><tr><th>XMLData</th></tr><tr><td>'' + replace( replace( convert(varchar(max),@blockingxml),  ''<'',''&lt;'' ),  ''>'',''&gt;'' )  
-              + ''</td></tr></table>''
+SELECT @body = ''<table cellpadding="2" cellspacing="2" border="1">''  
+       + ''<tr><th>currentdb</th><th>Nature</th><th>waittime</th><th>transactionname</th></th></th><th>lockMode</th></th>
+       </th><th>status</th></th></th><th>clientapp</th></th></th><th>hostname</th></th>
+       </th><th>loginname</th><th>inputbuf</th></tr>''  
+       + replace( replace( @body, ''&lt;'', ''<'' ), ''&gt;'', ''>'' )   
+       + ''</table>'' + ''<table cellpadding="2" cellspacing="2" border="1"><tr><th>XMLData</th></tr><tr><td>'' + replace( replace( convert(varchar(max),@blockingxml), ''<'',''&lt;'' ), ''>'',''&gt;'' ) 
+       + ''</td></tr></table>''
 
 DROP TABLE #BlockingDetails
 
@@ -333,18 +333,18 @@ DROP TABLE #BlockingDetails
 DECLARE @recipientsList varchar(8000)
 SELECT @recipientsList =''tnikolaychuk@rhainc.com''
 EXEC msdb.dbo.sp_send_dbmail
-    @profile_name		= ''DBA Mail Account'', 
-    @recipients			= @recipientsList,
-    @body				= @body,
-    @body_format		= ''HTML'',
-    @subject			= ''Alert! Blocking On HBEX SQL PROD  Server'',
-    @importance			= ''High'' ;
+  @profile_name		= ''DBA Mail Account'', 
+  @recipients			= @recipientsList,
+  @body				= @body,
+  @body_format		= ''HTML'',
+  @subject			= ''Alert! Blocking On HBEX SQL PROD Server'',
+  @importance			= ''High'' ;
 
 
 --Insert into a table for further reference
 INSERT INTO DBAWork.dbo.BlockedEvents
-                (AlertTime, BlockedReport)
-                VALUES (getdate(), N'$(ESCAPE_SQUOTE(WMI(TextData)))')
+        (AlertTime, BlockedReport)
+        VALUES (getdate(), N'$(ESCAPE_SQUOTE(WMI(TextData)))')
 
 --Execute sp to kill connection if it is a dbForge with sleeping status
 EXEC sp_KillBlocking_dbForge
@@ -353,7 +353,7 @@ EXEC sp_KillBlocking_dbForge
 UPDATE B
 	SET B.SPID = B.BlockedReport.value(''(/TextData/blocked-process-report/blocking-process/process/@spid)[1]'',''int'')
 	FROM DBAWork.dbo.BlockedEvents B 
-	where  B.Event_id = SCOPE_IDENTITY()  
+	where B.Event_id = SCOPE_IDENTITY() 
 
 ', 
 		@database_name=N'master', 
@@ -366,12 +366,12 @@ IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 COMMIT TRANSACTION
 GOTO EndSave
 QuitWithRollback:
-    IF (@@TRANCOUNT > 0) ROLLBACK TRANSACTION
+  IF (@@TRANCOUNT > 0) ROLLBACK TRANSACTION
 EndSave:
 
 GO
 
-  --5.  Creat an alert, select alert type as WMI event
+ --5. Creat an alert, select alert type as WMI event
 USE [msdb]
 GO
 DECLARE @jobid uniqueidentifier

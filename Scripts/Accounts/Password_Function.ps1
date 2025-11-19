@@ -17,3 +17,15 @@ $ofs="" #$ofs = output field separator
 }
 
 Get-NewPassword (20)
+
+
+--generate random password
+DECLARE @i int, @j int, @password varchar(15);
+SET @j=9 --length of password
+SET @i=1
+SET @password=''
+WHILE @i<=@j BEGIN
+	SET @password=@password+(select chr FROM DBAwork.dbo.characters where Id = round(rand()*70,0));
+	SET @i=@i+1
+END
+SELECT @password
