@@ -83,21 +83,57 @@ SELECT * FROM sys.server_file_audits;
 --to read from the audit file:
 SELECT event_time,action_id,session_server_principal_name, server_principal_name,server_instance_name,database_name,schema_name,object_name,statement, *
 FROM sys.fn_get_audit_file('E:\Audit\*.sqlaudit', DEFAULT, DEFAULT) 
-WHERE --action_id<>'VSST' and session_server_principal_name like '%tnikol%';
+WHERE action_id<>'VSST' and session_server_principal_name like '%tnikol%';
+
+
+--view the audit file:
+SELECT event_time,action_id,session_server_principal_name AS UserName,server_instance_name,database_name,schema_name,object_name,statement, *
+FROM sys.fn_get_audit_file('E:\Audit\*.sqlaudit', DEFAULT, DEFAULT) 
+WHERE statement<>'DBCC SQLPERF(LOGSPACE)' AND action_id<>'VSST';
 
 /*
-statement LIKE'%impersonate%' and session_server_principal_name<>'CENTENE\reports'
-
-
-statement<>'DBCC SQLPERF(LOGSPACE)' --action_id<>'VSST';
-
 --**action id list:
 VSST: View Server State
+*/
+
+/*
+--inspecting the audit file, I found many of these sort of errors:
+Network error code 0x2746 occurred while establishing a connection; the connection has been closed. This may have been caused by client or server login timeout expiration. 
+Time spent during login: total 501 ms, enqueued 0 ms, network writes 0 ms, network reads 501 ms, establishing SSL 0 ms, network reads during SSL 0 ms, network writes during 
+SSL 0 ms, secure calls during SSL 0 ms, enqueued during SSL 0 ms, negotiating SSPI 0 ms, network reads during SSPI 0 ms, network writes during SSPI 0 ms, secure calls during 
+SSPI 0 ms, enqueued during SSPI 0 ms, validating login 0 ms, including user-defined login processing 0 ms. [CLIENT: 10.4.129.224]
+
+--this error is NOT due to a flaky VPN connection from an outside database source to SQL server;
+*/
+
+
 
 --SQL Server Audit action_id list: https://cprovolt.wordpress.com/2013/08/02/sql-server-audit-action_id-list/
 --for a complete list of audit action groups:
 https://docs.microsoft.com/en-us/sql/relational-databases/security/auditing/sql-server-audit-action-groups-and-actions?view=sql-server-2017
 
 --to troubleshoot connection errors: go to server_LogonErrors
+--turn on trace flags to see any errors in the log:
+DBCC TRACEON (3689,4029,-1)
+GO
 
-*/
+--turn off the trace flags:
+DBCC TRACEOFF (3689,4029)
+
+
+--SQL Server Audit action_id list: https://cprovolt.wordpress.com/2013/08/02/sql-server-audit-action_id-list/
+
+--connection errors:
+SELECT dateadd (ms, (a.[Record Time] - sys.ms_ticks), GETDATE()) as [Notification_Time], a.* FROM 
+(SELECT 
+x.value('(//Record/@id)[1]', 'bigint') AS [Record_ID], 
+x.value('(//Record/Error/ErrorCode)[1]', 'varchar(30)') AS [ErrorCode], 
+x.value('(//Record/Error/APIName)[1]', 'varchar(255)') AS [APIName], 
+x.value('(//Record/Error/CallingAPIName)[1]', 'varchar(255)') AS [CallingAPIName], 
+x.value('(//Record/Error/SPID)[1]', 'int') AS [SPID], 
+x.value('(//Record/@time)[1]', 'bigint') AS [Record Time] 
+FROM (SELECT CAST (record as xml) FROM sys.dm_os_ring_buffers 
+WHERE ring_buffer_type = 'RING_BUFFER_SECURITY_ERROR') AS R(x)) a 
+CROSS JOIN sys.dm_os_sys_info sys 
+ORDER BY a.[Record_ID] DESC
+

@@ -18,22 +18,19 @@ SELECT * FROM sys.transmission_queue
 
 Setting up Service Broker involves:
 	1.  Enabling it at the database level:
-
-
 		ALTER DATABASE CMS_APP_Prod SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 		ALTER DATABASE CMS_QA6_App SET ENABLE_BROKER;
 		ALTER DATABASE CMS_APP_Prod SET MULTI_USER;
-*/
 
 SELECT name, is_broker_enabled FROM sys. databases 
 
-/*
+
 	2. Creating a message type
 	3. Creating a contract for the conversation
 	4. Creating queues for the communication
 	5. Creating services for the communication
 
-Steps 2 through have already been executed in the CMS_Prod_App database and the information is stored within the system tables of  the CMS_Prod_App database, 
+if Steps 2 through 5 have already been executed in a database, the information is stored within the system tables of  the database, 
 therefore there is no need to ever re-create these.  If the database is ever restored on a new server, the information will remain intact.
 
 
@@ -45,14 +42,13 @@ Monitoring
 	Service Broker>Reports>Service Broker Statistics
 	
 	The report has the following information:
-		? Status
-		? Services
-		? Queues
-		? Task Statistics
+		Status
+		Services
+		Queues
+		Task Statistics
 
 
 	• Service Queues
-	There are currently 2 service queues in the Service Broker of CMS_Prod_App database, this can be confirmed by executing 
 	select * from sys.service_queues
 		MobileDataChangedInitiatorQueue
 		MobileDataChangedTargetQueue

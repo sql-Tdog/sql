@@ -7,22 +7,17 @@ Install-Module -Name Az -AllowClobber
 Import-Module -Name Az
 Update-Module -Name Az
 
-$managedIdentity='xx'
-$managedIdClientId = 'xxx'
-$resourceGroup=''
-$storageAccountName=""
+
+$managedIdClientId = "xxx"
+$resourceGroup = ""
+$storageAccountName = ""
 $containerName = ""
-$policyName='DBBackup'
+$policyName =""
 
 # Connect to Azure with user-managed-assigned managed identity
-#new method:
-Az login --identity --allow-no-subscriptions
-
-#old method:
 $AzureContext = (Connect-AzAccount -Identity -AccountId $managedIdClientId).context 
 $AzureContext = Set-AzContext -SubscriptionName $AzureContext.Subscription  
 $AzureContext
-
 
 #get storage account key, needed to access storage containers:  
 $StAccountKey=Get-AzStorageAccountKey -ResourceGroupName $resourceGroup -Name $storageAccountName
