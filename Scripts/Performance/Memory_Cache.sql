@@ -1,7 +1,20 @@
 /*
---how much memory is SQL server using:
-SELECT physical_memory_in_use_kb/1024/1024. physical_memory_in_use_gb, locked_page_allocations_kb/1024/1024. locked_page_allocations_gb,
-* FROM sys.dm_os_process_memory
+How much memory is SQL server using?
+SELECT physical_memory_in_use_kb/1024/1024. physical_memory_in_use_gb, 
+locked_page_allocations_kb/1024/1024. locked_page_allocations_gb, * 
+FROM sys.dm_os_process_memory
+
+
+Can the system access enough memory?
+--semaphore:  a variable used for controlling access, by multiple processes, to a common 
+resource in a concurrent system
+SELECT * FROM sys.dm_exec_query_resource_semaphores
+
+waiter_count:  number of queries waiting for grants to be satisfied
+timeout_error_count:  total number of time-out errors since server startup
+forced_grant_count:  total number of forced minimum-memory grants since server startup
+	if value>0: the cause could be execution plans that are asking for unreasonably large memory grants due to bad statistics, or a very large concurrent workload and not enought memory to service it
+	will probably also see RESOURCE_SEMAPHORE waits
 
 --cache memory is not buffer pool memory, it is query execution memory
 select cache_memory_kb/1024/1024. cache_memory_gb, max_memory_kb/1024/1024. max_memory_gb, used_memory_kb/1024/1024. used_memory_gb, * from sys.dm_resource_governor_resource_pools
