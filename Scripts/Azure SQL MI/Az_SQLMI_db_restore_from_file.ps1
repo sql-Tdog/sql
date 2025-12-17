@@ -1,3 +1,8 @@
+<#
+for SQL MI: If Service-Managed Key is used for Transparent Data Encryption, 
+we just have to upload the backup cert to the MI in order to do a restore
+#>
+
 Install-Module -Name Az.Accounts  
 Install-Module -Name Az.Storage
 Install-Module -Name Az.Sql

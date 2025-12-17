@@ -5,12 +5,12 @@ CREATE CREDENTIAL [https://xxxx.blob.core.windows.net/container] WITH IDENTITY='
 
 select * from sys.credentials
 
-DROP CREDENTIAL [https://sqlbkp2euweulsto.blob.core.windows.net/dsdb]
+DROP CREDENTIAL [https://xxx.blob.core.windows.net/dsdb]
 
-BACKUP DATABASE Dxxx TO URL ='https://sqlbkp2euweulsto.blob.core.windows.net/dsdb/Dxx.bak' WITH COPY_ONLY;
+BACKUP DATABASE Dxxx TO URL ='https://xxx.blob.core.windows.net/dsdb/Dxx.bak' WITH COPY_ONLY;
 
 
 --to troubleshoot error 50 when trying to perform a backup, try accessing a file in the container
 --this one will throw "Access Denied" if firewall is not open to the container
-RESTORE FILELISTONLY FROM URL = 'https://sqlbkp1euneulsto.blob.core.windows.net/dsdb/Quartz.bak'
+RESTORE FILELISTONLY FROM URL = 'https://xxx.blob.core.windows.net/dsdb/Quartz.bak'
 
