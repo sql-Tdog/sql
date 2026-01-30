@@ -33,7 +33,7 @@ ORDER BY name
 
 
 --change a job (enable/disable/etc)
-msdb.dbo.sp_update_job @job_name='', @enabled=0;
+EXEC msdb.dbo.sp_update_job @job_name='', @enabled=0;
 
 
 /*
@@ -98,7 +98,7 @@ select * from msdb.dbo.sysjobhistory where job_id IN
 3: canceled
 4: in progress
 
-select  run_date, sum(run_duration) 'hhmmss' from msdb.dbo.sysjobhistory
+select run_date, sum(run_duration) 'hhmmss' from msdb.dbo.sysjobhistory
 where job_id IN ('9B56F223-E631-44F6-9EBC-CE563ACB74BD','F9F24A96-DF3C-455B-A744-C9EC02FDFA6A') and step_id=2
 group by run_date
 
