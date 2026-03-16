@@ -15,7 +15,7 @@ $List2=""
 $AD=$Env:userdomain
 $FQDN=$env:USERDNSDOMAIN
 
-#service account from AG1 to AG 2:
+#service account from AG 1 to AG 2:
 $Query="CREATE LOGIN [$AD\$AG1acct] FROM WINDOWS WITH DEFAULT_DATABASE=[master]
 GO
 GRANT ALTER ANY AVAILABILITY GROUP TO [$AD\$AG1acct];
@@ -38,7 +38,7 @@ GRANT CONNECT ON ENDPOINT::[Hadr_endpoint] TO [$AD\$AG2acct]"
 Invoke-Sqlcmd -ServerInstance $inst1 -Query $Query -TrustServerCertificate
 Invoke-Sqlcmd -ServerInstance $inst2 -Query $Query -TrustServerCertificate
 
-#first, create the DAG on global primary:
+#create the DAG on global primary:
 $Query="CREATE AVAILABILITY GROUP [$DAGName]  
    WITH (DISTRIBUTED)  
    AVAILABILITY GROUP ON  
@@ -56,11 +56,11 @@ $Query="CREATE AVAILABILITY GROUP [$DAGName]
          FAILOVER_MODE = MANUAL,  
          SEEDING_MODE = MANUAL 
       );    
-GO  
-"
+GO"
 
 Invoke-Sqlcmd -ServerInstance $List1-Query $Query 
 
+#join the secondary AG to the DAG
 $Query="ALTER AVAILABILITY GROUP [$DAGName]  
    JOIN  
    AVAILABILITY GROUP ON    
@@ -82,6 +82,3 @@ GO
 "
 Invoke-Sqlcmd -ServerInstance $List2-Query $Query 
 
-#Add db to the global primary AG:
-$Query="ALTER AVAILABILITY GROUP $AG1 ADD DATABASE [Sentry];"
-Invoke-Sqlcmd -ServerInstance $List1 -Query $Query 

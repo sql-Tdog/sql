@@ -1,0 +1,18 @@
+let FilteredEvents =
+DSEvents
+    | where Timestamp between (datetime('2026-01-08T16:05:35.0000000Z') .. datetime('2026-01-08T19:08:03.0000000Z'))
+       and Data has "System.Data.SqlClient.SqlException (0x80131904): A transport-level error"
+       and Data has "envelopeshard" 
+       and Data !has "Login failed for user"
+       and AppLocalInstanceName !in ("DatabaseRepl")
+       and Name !in ("AzureSupportTickets")
+       and isnotempty(TraceToken) 
+    | project  TraceToken;
+let FilteredRequeston =
+    RequestEvents
+    | where Timestamp between (datetime('2026-01-08T16:05:35.0000000Z') .. datetime('2026-01-08T19:08:03.0000000Z'))
+    | where isnotempty( AccountId)
+    | project TraceToken, AccountId;
+FilteredEvents
+| join kind=innerunique FilteredRequeston on TraceToken
+| distinct AccountId

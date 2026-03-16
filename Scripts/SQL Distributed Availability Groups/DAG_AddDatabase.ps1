@@ -1,4 +1,3 @@
-
 $db="databasename"
 
 $Query="SELECT Location FROM BackupLocation WHERE BackupGroupName='$AG1'"
@@ -23,10 +22,19 @@ New-DbConnection $inst3 -DatabaseName "master" | New-DbCommand $Query | Get-DbDa
 
 Get-ChildItem -Path $OnPremBackupLocation | Sort-Object LastWriteTime | Select-Object -first 3
 
+<#
+at this point, the database on the secondary AG should be in restoring mode
+and the t-logs should be restored to the most current one,
+then we can set it to the HADR AG and it will start synchronizing
+this must be done on each replica separately
+#>
 
 $Query="ALTER DATABASE $db SET HADR AVAILABILITY GROUP = $AG2;"
 Invoke-Sqlcmd -ServerInstance $inst3 -Query $Query 
 Invoke-Sqlcmd -ServerInstance $inst4 -Query $Query 
+
+#if there is a second DAG connected to the first one in a daisy chain,
+# then we can set the db to the 3rd AG like this:
 $Query="ALTER DATABASE $db SET HADR AVAILABILITY GROUP = $AG3;"
 Invoke-Sqlcmd -ServerInstance $inst5 -Query $Query 
 Invoke-Sqlcmd -ServerInstance $inst6 -Query $Query 

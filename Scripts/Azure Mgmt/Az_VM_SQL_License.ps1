@@ -13,3 +13,4 @@ $VMname = "xxx"
 $LicenseType = "DR"
 Update-AzSqlVM -ResourceGroupName $RGname -Name $VMname -LicenseType $LicenseType
 
+

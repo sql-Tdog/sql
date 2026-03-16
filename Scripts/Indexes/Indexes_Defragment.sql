@@ -28,7 +28,6 @@ INNER JOIN ' + quotename(name) +
   where state_desc = 'ONLINE' and database_id IN (5,6,7,8,9,11,12)
  
  
- 
 execute(@SQL)
  
 select * from #FragmentedIndexs order by AvgFragmentationInPercent desc;
