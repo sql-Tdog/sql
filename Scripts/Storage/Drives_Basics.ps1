@@ -49,7 +49,7 @@ $allocationUnit = 65536
   
 $DiskCount = $PhysicalDisks.count
   
-New-StoragePool -FriendlyName "SQLDATAPOOL" -StorageSubsystemFriendlyName "Windows Storage*" -PhysicalDisks $PhysicalDisks | New-VirtualDisk -FriendlyName "SQLDATA01" -Interleave $StripeSize -NumberOfColumns $DiskCount -ResiliencySettingName simple –UseMaximumSize |Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -DriveLetter "G" -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLDATA01" -AllocationUnitSize $allocationUnit -Confirm:$false -UseLargeFRS
+New-StoragePool -FriendlyName "SQLDATAPOOL" -StorageSubsystemFriendlyName "Windows Storage*" -PhysicalDisks $PhysicalDisks | New-VirtualDisk -FriendlyName "SQLDATA01" -Interleave $StripeSize -NumberOfColumns $DiskCount -ResiliencySettingName simple -UseMaximumSize |Initialize-Disk -PartitionStyle GPT -PassThru | New-Partition -DriveLetter "G" -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "SQLDATA01" -AllocationUnitSize $allocationUnit -Confirm:$false -UseLargeFRS
 
 
 #Export data of all drives on server:
@@ -72,3 +72,10 @@ New-StoragePool -FriendlyName "SQLDATAPOOL" -StorageSubsystemFriendlyName "Windo
 
 #view bytes per cluster:
 fsutil fsinfo ntfsinfo F:/
+
+<#set sector byte size to 4096 on all SQL disks
+Premium_LRS disks: present as 512-byte logical sectors for compatibility, even if the physical sector is 4k:
+$drives | select SystemName, Model, BytesPerSector, Size
+Bytes Per Sector: 512 Bytes Per Physical Sector: 4096
+
+#>

@@ -59,3 +59,12 @@ $storageUri=$cbc.Uri.AbsoluteUri
 $tsql = "BACKUP DATABASE dummydb TO URL ='$backupURL'; "
 Invoke-Sqlcmd -ServerInstance $inst1 -Query $tSql -TrustServerCertificate
 
+
+$fileShareUrl = "\\$storageAccountName.file.core.windows.net\backups"
+$userName = "localhost\$storageAccountName"
+
+#mount the share 
+net use Y: $fileShareUrl /user:$userName $storageAccountKey 2>&1
+
+# Get space information
+Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='Y:'" -OperationTimeoutSec 30
