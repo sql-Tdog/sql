@@ -13,7 +13,7 @@ DBCC PAGE( DB_ID('database'),filenumber, pagenumber,printoption)
 SELECT * FROM sys.databases;
 
 --get file id:
-SELECT file_id,  name AS FileName, size/128.0/1024 AS CurrentSizeGB,  
+SELECT file_id, name AS FileName, size/128.0/1024 AS CurrentSizeGB,  
 size/128.0/1024 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS INT)/128.0/1024 AS FreeSpaceGB 
 FROM sys.database_files 
 

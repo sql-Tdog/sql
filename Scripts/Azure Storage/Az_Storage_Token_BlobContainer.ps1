@@ -4,7 +4,7 @@ this script uses the VMs User Assigned Managed Identity to generate a Storage Ac
 
 ####>
 Install-Module -Name Az -AllowClobber
-Import-Module -Name Az
+Import-Module -Name Az.Accounts
 Update-Module -Name Az
 
 

@@ -8,7 +8,7 @@
  
 --get all fragmented indexes in all databases and dump them into a table:
 CREATE TABLE  #FragmentedIndexs  (db varchar(25),sch VARCHAR(15),ObjectName VARCHAR(100), IndexName Varchar(500),
-                     IndexType Varchar(25), AvgFragmentationInPercent DECIMAL(6,2),FragmentCount INT,AvgFragmentSizeInPage DECIMAL(6,2), Pages INT, [FillFactor] INT)
+IndexType Varchar(25), AvgFragmentationInPercent DECIMAL(6,2),FragmentCount INT,AvgFragmentSizeInPage DECIMAL(6,2), Pages INT, [FillFactor] INT)
 declare @SQL nvarchar(max);
 set @SQL = ''
 select @SQL = @SQL +
