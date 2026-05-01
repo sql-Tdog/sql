@@ -50,6 +50,10 @@ LEFT JOIN msdb.dbo.backupmediafamily AS F ON F.media_set_id = B.media_set_id
 where database_id<>2
 
 *****************************/
+--check for free space in databases:
+SELECT DB_NAME() AS DbName, name AS FileName, size/128.0 CurrentSizeMB, size/128.0/1024 AS CurrentSizeGB,  
+size/128.0/1024 - CAST(FILEPROPERTY(name, 'SpaceUsed') AS INT)/128.0/1024 AS FreeSpaceGB 
+FROM sys.database_files; 
 
 /***********transaction log size check*******************************************************************************************************
 ***for databases in SIMPLE recovery mode, take a look at their transaction log size and % being used and if it ever was backed up*************

@@ -38,42 +38,23 @@ BACKUP DATABASE databasename TO DISK = 'E:\SQLServerBackup\databasebackup.bak' W
 
 
 --*******************new server setup**********************************************************************************************
---restoring an ancrypted backup file on a different SQL instance requires restoring 3 files:
---1.  restoring the server master key a& database master key from their backup files
---2.  creating the certificate from its backup file, which involves the private key file and the original encryption password
+--restoring an ancrypted backup file on a different SQL instance requires restoring the backup 
+--cert & private key
 
-
+--on existing server:
 USE Master;
 GO
-BACKUP SERVICE MASTER KEY TO FILE = 'U:\K\SMK.key' ENCRYPTION BY PASSWORD='Password123.#';
-GO
-USE SSISDB
-GO
-BACKUP MASTER KEY TO FILE = 'U:\Backup\DMK.key' ENCRYPTION BY PASSWORD='Password123.#';
-GO
 select * from sys.certificates;
-SELECT * FROM master.sys.symmetric_keys;
-SELECT * FROM sys.symmetric_keys 
-SELECT * FROM sys.credentials;
-
-select * from sys.databases;
-BACKUP CERTIFICATE TDECert2 TO FILE = 'U:\Keys\TDECert2.cert' WITH PRIVATE KEY (file='U:\Keys\TDECert2.key', ENCRYPTION BY PASSWORD='Password123.#');
-BACKUP CERTIFICATE ServerCert_PDX1ONECMSDBCL TO FILE = 'U:\Keys\ServerCert_PDX1ONECMSDBCL.cert' WITH PRIVATE KEY 
-	(file='U:\Keys\ServerCert_PDX1ONECMSDBCL.key'
-	, ENCRYPTION BY PASSWORD='Password123.#');
+BACKUP CERTIFICATE TDECert2 TO FILE = 'U:\Keys\TDECert2.cert' WITH PRIVATE KEY 
+	(file='U:\Keys\TDECert2.key', ENCRYPTION BY PASSWORD='Password123.#');
 
 
-RESTORE SERVICE MASTER KEY FROM FILE ='U:\Backup\SMK.key' DECRYPTION BY PASSWORD ='Password123.#';
+--on new server:
+CREATE CERTIFICATE TDECert2 FROM FILE = 'U:\Backup\TDECert2.cert' WITH PRIVATE KEY 
+	(FILE='U:\Backup\TDECert2.key', DECRYPTION BY PASSWORD='Password123.#');
 GO
-RESTORE MASTER KEY FROM FILE='U:\Backup\DMK.key' DECRYPTION BY PASSWORD='Password123.#'	ENCRYPTION BY PASSWORD='Turbul3ntPhras3!&';
-GO
-OPEN MASTER KEY DECRYPTION BY PASSWORD='Turbul3ntPhras3!&';
-ALTER MASTER KEY ADD ENCRYPTION BY SERVICE MASTER KEY;
 
-GO
-CREATE CERTIFICATE TDECert2 FROM FILE = 'U:\Backup\TDECert2.cert' WITH PRIVATE KEY (FILE='U:\Backup\TDECert2.key', DECRYPTION BY 
-	PASSWORD='Password123.#');
-GO
---this cert is used to encrypt CMS_APP database backups:
-CREATE CERTIFICATE ServerCert_PDX1ONECMSDBCL FROM FILE = 'U:\Backup\ServerCert_PDX1ONECMSDBCL.cert' WITH PRIVATE KEY 
-(FILE='U:\Backup\ServerCert_PDX1ONECMSDBCL.key', DECRYPTION BY 	PASSWORD='Password123.#');
+/*if the database is configured in a DAG and full backups are taken in one AG and t-log 
+backups are taken in the other AG and the backup certificates don't match, then restore
+the backup certs from both AGs and both full backup and t-log backups can be restored on 
+the new node */
