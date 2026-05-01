@@ -33,5 +33,6 @@ setspn -L $gmsaSQL
 
 <#
 if there's an error "The target principal name is incorrect.  Cannot generate SSPI context."
-remove then add back the GMSA account from SQL Services, set it to a default account
+-check to make sure correct spn was set
+-remove the GMSA account from SQL Services, set it to a default account, then add back
 #>
