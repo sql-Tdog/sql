@@ -1,5 +1,5 @@
 #get drive info
-Get-WmiObject -Class Win32_volume -Filter "Filesystem='NTFS'" -ComputerName 'FRASDB005' | Select-Object Name, Label, BlockSize, FreeSpace, Capacity | Format-Table -Autosize 
+Get-WmiObject -Class Win32_volume -Filter "Filesystem='NTFS'" -ComputerName 'Servername' | Select-Object Name, Label, BlockSize, FreeSpace, Capacity | Format-Table -Autosize 
 
 #reset drives to uninitialized status:
 clear-disk -number 6 -RemoveData -Confirm:$False
@@ -34,6 +34,12 @@ Get-Disk -Number 5 | New-Volume -FileSystem NTFS -DriveLetter L -FriendlyName 'L
 Get-Disk | where partitionstyle -eq "raw" 
 #this will return disk number, use it to format disk and assign letter:
 Get-Disk -Number 5 | New-Volume -FileSystem NTFS -DriveLetter H -FriendlyName 'SQL Data (H)' -AllocationUnitSize 65536
+
+#expand a drive:
+$Partition = Get-Partition | Where DriveLetter -EQ L #use this if needed: Select -Skip 1  -First 1
+$Partition #view to make sure we didn't select all of the L drives in the cluster
+$Partition | Resize-Partition -Size ($Partition | Get-PartitionSupportedSize).SizeMax
+
 
 #Create folders
 mkdir "H:\MSSQL\Data" | Out-Null;

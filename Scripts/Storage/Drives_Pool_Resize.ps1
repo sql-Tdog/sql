@@ -50,3 +50,30 @@ Resize-VirtualDisk -FriendlyName $vdisk.FriendlyName -Size ($Virtualdiskresize)
 $Partition = $vdisk | Get-Disk | Get-Partition | Where-Object PartitionNumber -Eq 2
 $Partition | Resize-Partition -Size ($Partition | Get-PartitionSupportedSize).SizeMax
 
+
+<#####this can be accomplished via Server Manager GUI######
+1. after new disks are created, open Server Manager > File and Storage Services on left tab menu
+2. click on Storage Pools on the left hand side and wait for all disk data to be populated in center
+3. select storage pool to be upsized and clicks on TASKS drop down menu in PHYSICAL DISKS tile
+4. in the pop-up, expand Name column to see the full name of disk and select disks that match the 
+server storage pool to be upsized, click OK; the TASK PROGRESS may not match selected 
+5. if the number of disks matches the column size of the virtual disk, right click on Virtual Disk
+and "Extend Virtual Disk"; select Maximum size
+6.  if this is not possible, then the storage pool needs to be optimized: (could take days)
+Get-StoragePool -FriendlyName "SQL Data Pool (F)" | Optimize-StoragePool -AsJob
+7.  Once VD is extended, expand the drive:
+Get-VirtualDisk 
+$vdisk = Get-VirtualDisk -FriendlyName "SQL Data Disk (F)"
+
+#if the virtual disks are all named the same, try different ways of selecting the rigth one
+$vdisk = Get-VirtualDisk -FriendlyName "SQL Data Disk (F)" | Where-Object FootprintOnPool -EQ 6588479832064
+$vdisk = Get-VirtualDisk -FriendlyName "SQL Data Disk (F)" | Where-Object FootprintOnPool -EQ 6588479832064 | Select-Object -Skip 2 -First 1
+
+#check size of partition to verify that the right one is selected, it should not be the new size
+$Partition = $vdisk | Get-Disk | Get-Partition | Where PartitionNumber -Eq 2
+$Partition | Resize-Partition -Size ($Partition | Get-PartitionSupportedSize).SizeMax
+
+#verify size of drive:
+Get-WmiObject -Class Win32_volume -Filter "Filesystem='NTFS'" -ComputerName 'servername' | Where-Object Name -EQ "F:\" | Select-Object Name, Label, Capacity 
+
+#>
