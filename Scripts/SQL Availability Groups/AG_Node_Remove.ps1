@@ -13,18 +13,28 @@ Invoke-Sqlcmd -ServerInstance $AGListener -Query $tsql
 #remove node from cluster:
 $clusterName = ""
 $listener = ""
-Remove-ClusterNode -Cluster $clusterName = "" -Name $nodeToRemove
+Remove-ClusterNode -Cluster $clusterName -Name $nodeToRemove
 
-#remove resources from cluster:
+#view cluster resources:
 $clusterResources = Get-ClusterResource -Cluster $clusterName
 $clusterResources
-$IPtoDelete = ""
+
+
+#verify IP to delete:
+$IPtoDelete = ""  #node's listener IP
 $AG_IP = "$AGname`_$IPtoDelete"
-$cluterResourceToDelete = $clusterResources | select Name, State, OwnerGroup, ResourceType |  where { $_.ResourceType -eq "IP Address" -and $_.Name -like "$IPtoDelete" }
+$cluterResourceToDelete = $clusterResources | select-object Name, State, OwnerGroup, ResourceType |  Where-Object { $_.ResourceType -eq "IP Address" -and $_.Name -like "$IPtoDelete" }
 $cluterResourceToDelete | ft -autosize
 
-#verify these lines by testing them:
+#remove old node IP from cluster:
 Get-ClusterResource -Cluster $clusterName -Name $AG_IP | Remove-ClusterResource
-Get-ClusterResource -Cluster $clusterName -Name "IP Address 10.xxx.xxx.91" | Remove-ClusterResource
+
 Get-ClusterResource -Cluster $clusterName
-nslookup $listener 
+
+#verify health of listener:
+nslookup $AGListener 
+$tsql = "select name from sys.databases"
+Invoke-Sqlcmd -ServerInstance $AGListener -Query $tsql 
+
+#another way to remove the IP:
+Get-ClusterResource -Cluster $clusterName -Name "IP Address 10.xxx.xxx.91" | Remove-ClusterResource

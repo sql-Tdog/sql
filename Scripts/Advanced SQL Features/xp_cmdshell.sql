@@ -22,7 +22,7 @@ go
 
 --view files in a directory:
 --xp_dirtree returns depth and bit for if it's a file or not
-EXEC xp_dirtree '\\w3sqldbawu3i01\share\', 1,1
+EXEC xp_dirtree '\\servername\share\', 1,1
 
 EXEC xp_cmdshell 'dir *.exe';
 GO

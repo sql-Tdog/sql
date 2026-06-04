@@ -40,6 +40,9 @@ SET @backupPath  ='D:\Temp\Database\'
 INSERT INTO #fileList(backupFile, depth, isfile) 
 EXEC master.sys.xp_dirtree 'D:\Temp\Database\', 1,1
 
+/* if files are on an attached virtual Z drive (mounted Azure storage container)
+EXEC xp_dirtree 'Z:\Database\LOG\', 1,1
+*/
 
 DECLARE backupFiles CURSOR FOR  
    SELECT backupFile  
